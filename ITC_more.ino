@@ -4,8 +4,6 @@
 // #include <Wire.h>      // i2c
 // it seems that Serial.h is loaded by default
 
-#define vm(n) pgm_read_word_near(memory[n])
-
 // circular stack, similar to GA144
 const int STKSIZE = 16;
 const int STKMASK = 15;
@@ -31,7 +29,7 @@ next:
     case 0: Serial.write(stack[S++]);goto next; // emit
     case 1: delay(stack[S++]);goto next;        // ms
     case 2: I=pgm_read_word(&memory[I++]);goto next; // branch
-    case 3: stack[--S]=pgm_read_word(&memory[I++]);  // lit
+    case 3: stack[--S]=pgm_read_word(&memory[I++]);goto next; // lit
     default: goto next;
   }  
 }

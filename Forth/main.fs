@@ -24,7 +24,7 @@ host
 : code  
    \ make a label and restore input stream
    host >in @ label >in !
-   \ make a host in the host and remember current target address
+   \ make a word in the host and remember current target address
    create target here 2/ host ,  \ code memory is word addressed
       \ suppress optimizations and switch to target vocab (postponed),
       hide postpone target
@@ -44,5 +44,5 @@ code 1+ ( n - n)  5 ,
 lit 65 , ( begin) 1+ dup emit lit 1000 , ms branch 9 , ( again)
 
 :m check  target-image 64 dump m;
-check
+check .words
 

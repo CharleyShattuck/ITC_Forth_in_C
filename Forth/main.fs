@@ -35,13 +35,17 @@ target
 0 org  
 7 ,
 code lit ( c)  3 ,
+:m #, ( a)  lit , m;
+\ think of #, as a literal instruction in an assembler
 code branch ( c)  2 ,
+:m begin (  - a)  here 2/ m;
+:m again ( a)  branch , m;
 code emit ( c)  0 ,
 code ms (  c)  1 ,
 code dup ( n - n)  4 ,
 code 1+ ( n - n)  5 ,
 
-lit 65 , ( begin) 1+ dup emit lit 1000 , ms branch 9 , ( again)
+65 #, begin 1+ dup emit 1000 #, ms again
 
 :m check  target-image 64 dump m;
 check .words

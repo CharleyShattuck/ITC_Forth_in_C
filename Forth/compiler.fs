@@ -85,6 +85,27 @@ nowarn
    labels begin  @ dup while  dup show space  repeat  drop ;
 warn
 
+create _crlf  2 c, 13 c, 10 c,
+create _comma  3 c, 32 c, char , c, 32 c,
+: (.) ( n - a n)  0 <# #s #> ;
+0 value save-fid
+: spit ( a n)  save-fid write-file abort" write error" ;
+: crlf  _crlf count spit ;
+: save  (  - )
+	0 to save-fid   s" ITC.ino" delete-file drop
+	s" ITC.ino" r/w create-file abort" Error creating ITC.ino" to save-fid
+\    target-image target-size save-fid write-file abort" Error writing ITC.ino"
+    s" // ITC.ino" save-fid write-file abort" write error" crlf
+    crlf
+    s" const int PROGMEM memory[] = {" spit crlf
+    crlf
+    target-image ( target-size 2/) 1024 0 do
+        dup w@ (.) spit _comma count spit 2 +
+        i 7 and 0= if crlf then
+    loop drop
+    s" };" spit crlf
+	save-fid close-file abort" Error closing ITC.ino" ;
+
 0 [if]
 \ ----- Headers on the target ----- /
 variable thp

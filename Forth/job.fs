@@ -50,5 +50,5 @@ include ./compiler.fs
 include ./main.fs  \ application code, ends with go
 
 host : .stack  depth if  >red  then  .s >black cr ;
-( report save) host .( Host stack= ) .stack
+save host .( Host stack= ) .stack
 

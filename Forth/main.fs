@@ -1,7 +1,7 @@
 \ main.fs 
 
 0 [if]
-Copyright (C) 2016-2018 by Charles Shattuck.
+Copyright (C) 2016-2021 by Charles Shattuck.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 
 [then]
+warnings off
 host 
 : code  
    \ make a label and restore input stream
@@ -30,10 +31,9 @@ host
       hide postpone target
    \ runtime behavior is to lay down a code field in the target
    does> @ ,-t ;
-target
+: turnkey target here 2/ 0 !-t ;
 
-0 org  
-7 ,
+target 2 org \ target-image is byte addressed here 
 code lit ( c)  3 ,
 :m #, ( a)  lit , m;
 \ think of #, as a literal instruction in an assembler
@@ -44,9 +44,13 @@ code emit ( c)  0 ,
 code ms (  c)  1 ,
 code dup ( n - n)  4 ,
 code 1+ ( n - n)  5 ,
+code exit  7 ,
+:m :  code 6 , m;
+:m ;  exit m;
 
-65 #, begin 1+ dup emit 1000 #, ms again
+: .A.  65 #, ;
+turnkey ( 65 #,) .A. begin 1+ dup emit 1000 #, ms again
 
 :m check  target-image 64 dump m;
-check .words
+.words check
 

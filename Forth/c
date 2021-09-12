@@ -1,1 +1,1 @@
-gforth ./job.fs -e "bye "
+gforth ./job.fs -e " bye "

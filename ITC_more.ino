@@ -9,7 +9,7 @@ const int STKSIZE = 8;
 const int STKMASK = 7;
 int stack [STKSIZE];
 #define DROP T=stack[S++];S&=STKMASK
-#define PUSH S=--S;S&=STKMASK
+#define PUSH S=--S&STKMASK
 #define DUP PUSH;stack[S]=T
 
 // Forth registers
@@ -30,12 +30,37 @@ void loop () {
 next: 
   W=pgm_read_word(&memory[I++]);
   switch (pgm_read_word(&memory[W])) {
-    case 0: Serial.write(T);DROP;goto next; // emit
-    case 1: delay(T);DROP;goto next;        // ms
-    case 2: I=pgm_read_word(&memory[I++]);goto next; // branch
-    case 3: PUSH;T=pgm_read_word(&memory[I++]);goto next; // lit
-    case 4: DUP;goto next; // dup
-    case 5: T=T+1;goto next; // 1+
-    default: goto next;
+    case 0: // emit
+        Serial.write(T);
+        DROP;
+        goto next;
+    case 1: // ms
+        delay(T);
+        DROP;
+        goto next;
+    case 2: // branch
+        I=pgm_read_word(&memory[I++]);
+        goto next;
+    case 3: // lit
+        PUSH;
+        T=pgm_read_word(&memory[I++]);
+        goto next;
+    case 4: // dup
+        DUP;
+        goto next;
+    case 5: // 1+
+        T=T+1;
+        goto next;
+    case 6: // enter
+        R=--R&STKMASK;
+        R=I;
+        I=++W;
+        goto next;
+    case 7: // exit
+        I=R;
+        R=++R&STKMASK;
+        goto next;
+    default:
+        goto next;
   }  
 }

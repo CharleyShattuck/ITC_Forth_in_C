@@ -30,37 +30,51 @@ void loop () {
 next: 
   W=pgm_read_word(&memory[I++]);
   switch (pgm_read_word(&memory[W])) {
-    case 0: // emit
-        Serial.write(T);
-        DROP;
-        goto next;
-    case 1: // ms
-        delay(T);
-        DROP;
-        goto next;
-    case 2: // branch
-        I=pgm_read_word(&memory[I++]);
-        goto next;
-    case 3: // lit
-        PUSH;
-        T=pgm_read_word(&memory[I++]);
-        goto next;
-    case 4: // dup
-        DUP;
-        goto next;
-    case 5: // 1+
-        T=T+1;
-        goto next;
-    case 6: // enter
+    case 0: // enter
         R=--R&STKMASK;
         R=I;
         I=++W;
         goto next;
-    case 7: // exit
+    case 1: // exit
         I=R;
         R=++R&STKMASK;
         goto next;
+    case 2: // emit
+        Serial.write(T);
+        DROP;
+        goto next;
+    case 3: // ms
+        delay(T);
+        DROP;
+        goto next;
+    case 4: // branch
+        I=pgm_read_word(&memory[I++]);
+        goto next;
+    case 5: // 0branch
+        if(T=0) {
+            I=pgm_read_word(&memory[I++]);
+            goto next;
+        }
+        I=++I;
+        goto next;
+    case 6: // lit
+        PUSH;
+        T=pgm_read_word(&memory[I++]);
+        goto next;
+    case 7: // .
+        Serial.print(T);
+        Serial.print(' ');
+        DROP;
+        goto next;
+    case 8: // dup
+        DUP;
+        goto next;
+    case 9: // 1+
+        T=T+1;
+        goto next;
     default:
+        // should abort here?
         goto next;
   }  
 }
+

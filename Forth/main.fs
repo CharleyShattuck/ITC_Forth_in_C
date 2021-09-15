@@ -33,23 +33,27 @@ host
    does> @ ,-t ;
 : turnkey target here 2/ 0 !-t ;
 
-target 2 org \ target-image is byte addressed here 
-code lit ( c)  3 ,
-:m #, ( a)  lit , m;
+target 2 org \ target-image is byte addressed here
+code exit  1 ,
+code emit  2 ,
+code ms  3 ,
+code branch  4 ,
+code 0branch  5 ,
+code lit ( c)  6 ,
+code . ( n)  7 ,
+code dup ( n - n)  8 ,
+code 1+ ( n - n)  9 ,
+
 \ think of #, as a literal instruction in an assembler
-code branch ( c)  2 ,
+:m #, ( a)  lit , m;
 :m begin (  - a)  here 2/ m;
 :m again ( a)  branch , m;
-code emit ( c)  0 ,
-code ms (  c)  1 ,
-code dup ( n - n)  4 ,
-code 1+ ( n - n)  5 ,
-code exit  7 ,
-:m :  code 6 , m;
+:m :  code  0 , m;
 :m ;  exit m;
 
-: .A.  65 #, ;
-turnkey ( 65 #,) .A. begin 1+ dup emit 1000 #, ms again
+: space  32 #, emit ;
+: cr  13 #, emit 10 #, emit ;
+turnkey char A #, begin 1+ dup . dup emit space 1000 #, ms cr again
 
 :m check  target-image 64 dump m;
 .words check

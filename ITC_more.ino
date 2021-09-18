@@ -4,13 +4,11 @@
 // #include <Wire.h>      // i2c
 // it seems that Serial.h is loaded by default
 
-// circular stack, similar to GA144
-const int STKSIZE = 8;
-const int STKMASK = 7;
+// stack grows upwards, makes .s easier
+const int STKSIZE = 16;
 int stack [STKSIZE];
-#define DROP T=stack[S++];S&=STKMASK
-#define PUSH S=--S&STKMASK
-#define DUP PUSH;stack[S]=T
+#define DROP T=stack[--S]
+#define DUP stack[S++]=T
 
 // Forth registers
 int W=0; // working register
@@ -19,6 +17,31 @@ int S=0; // data stack pointer
 int R=0; // return stack pointer
 int T=0; // top of stack, cached
 
+void dotS () {
+    switch(S) {
+    case 0:
+        Serial.print("empty ");
+        return;
+    case 1:
+        Serial.print(T);
+        Serial.print(' ');
+        return;
+    case 2:
+        Serial.print(stack[1]);
+        Serial.print(' ');
+        Serial.print(T);
+        Serial.print(' ');
+        return;
+    default:
+        for (int i=1; i<S; i++) {
+            Serial.print(stack[i]);
+            Serial.print(' ');
+        }
+        Serial.print(T);
+        Serial.print(' ');
+    }
+}
+ 
 void setup() {
   Serial.begin (9600);
 }
@@ -31,13 +54,11 @@ next:
   W=pgm_read_word(&memory[I++]);
   switch (pgm_read_word(&memory[W])) {
     case 0: // enter
-        R=--R&STKMASK;
-        R=I;
+        --R=I;
         I=++W;
         goto next;
     case 1: // exit
-        I=R;
-        R=++R&STKMASK;
+        I=R++;
         goto next;
     case 2: // emit
         Serial.write(T);
@@ -58,7 +79,7 @@ next:
         I=++I;
         goto next;
     case 6: // lit
-        PUSH;
+        DUP;
         T=pgm_read_word(&memory[I++]);
         goto next;
     case 7: // .
@@ -66,14 +87,20 @@ next:
         Serial.print(' ');
         DROP;
         goto next;
-    case 8: // dup
+    case 8: // .s
+        dotS();
+        goto next;
+    case 9: // dup
         DUP;
         goto next;
-    case 9: // 1+
+    case 10: // drop
+        DROP;
+        goto next;
+    case 11: // 1+
         T=T+1;
         goto next;
     default:
-        // should abort here?
+        // should we abort here?
         goto next;
   }  
 }

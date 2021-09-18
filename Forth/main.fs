@@ -41,20 +41,28 @@ code branch  4 ,
 code 0branch  5 ,
 code lit ( c)  6 ,
 code . ( n)  7 ,
-code dup ( n - n)  8 ,
-code 1+ ( n - n)  9 ,
-
+code .s  8 ,
+code dup ( n - n)  9 ,
+code drop ( n)  10 ,
+code 1+ ( n - n+1)  11 ,
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;
 :m begin (  - a)  here 2/ m;
 :m again ( a)  branch , m;
+:m until ( a)  0branch , m;
+:m if ( - a)  0branch begin 0 , m;
+:m then ( a)  here swap !-t ;
 :m :  code  0 , m;
 :m ;  exit m;
 
 : space  32 #, emit ;
 : cr  13 #, emit 10 #, emit ;
-turnkey char A #, begin 1+ dup . dup emit space 1000 #, ms cr again
+turnkey
+\    begin .s cr 1 #, .s cr 2 #, .s cr 3 #, .s cr
+\    drop drop drop .s cr 1000 #, ms cr again
+  1 #, 2 #, 3 #, 65535 #, char A #, begin  .s cr 
+  dup . dup emit space 1000 #, ms cr again
 
-:m check  target-image 64 dump m;
+:m check  target-image 128 dump m;
 .words check
 

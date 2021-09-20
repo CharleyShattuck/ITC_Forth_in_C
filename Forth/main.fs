@@ -33,7 +33,7 @@ host
    does> @ ,-t ;
 : turnkey target here 2/ 0 !-t ;
 
-target 2 org \ target-image is byte addressed here
+target 2 org \ target-image is byte addressed here on the Forth side
 code exit  1 ,
 code emit  2 ,
 code ms  3 ,
@@ -44,24 +44,31 @@ code . ( n)  7 ,
 code .s  8 ,
 code dup ( n - n)  9 ,
 code drop ( n)  10 ,
-code 1+ ( n - n+1)  11 ,
+code + ( n1 n2 - n3)  11 ,
+code and ( n1 n2 - n3)  12 ,
+code or ( n1 n2 - n3)  13 ,
+code xor ( n1 n2 - n3)  14 ,
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;
-:m begin (  - a)  here 2/ m;
-:m again ( a)  branch , m;
-:m until ( a)  0branch , m;
+:m begin (  - a)  here m;
+:m again ( a)  branch [ 2/ ] , m;
+:m until ( a)  0branch [ 2/ ] , m;
+:m then ( a)  here [ 2/ swap ] !-t ;
 :m if ( - a)  0branch begin 0 , m;
-:m then ( a)  here swap !-t ;
+:m while ( a1 - a2 a1)  if [ swap ] m;
+:m repeat ( a1 a2 - )  again then m;
 :m :  code  0 , m;
 :m ;  exit m;
 
 : space  32 #, emit ;
 : cr  13 #, emit 10 #, emit ;
+: wait  1000 #, ms ;
 turnkey
-\    begin .s cr 1 #, .s cr 2 #, .s cr 3 #, .s cr
-\    drop drop drop .s cr 1000 #, ms cr again
-  1 #, 2 #, 3 #, 65535 #, char A #, begin  .s cr 
-  dup . dup emit space 1000 #, ms cr again
+    begin wait 10 #, 
+        begin -1 #, + dup
+        while [ char A ] #, emit wait
+        repeat drop cr
+    again
 
 :m check  target-image 128 dump m;
 .words check

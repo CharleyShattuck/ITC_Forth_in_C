@@ -26,12 +26,6 @@ void dotS () {
         Serial.print(T);
         Serial.print(' ');
         return;
-    case 2:
-        Serial.print(stack[1]);
-        Serial.print(' ');
-        Serial.print(T);
-        Serial.print(' ');
-        return;
     default:
         for (int i=1; i<S; i++) {
             Serial.print(stack[i]);
@@ -72,11 +66,13 @@ next:
         I=pgm_read_word(&memory[I++]);
         goto next;
     case 5: // 0branch
-        if(T=0) {
+        if(T==0) {
+            DROP;
             I=pgm_read_word(&memory[I++]);
             goto next;
         }
-        I=++I;
+        I+=1;
+        DROP;
         goto next;
     case 6: // lit
         DUP;
@@ -96,8 +92,17 @@ next:
     case 10: // drop
         DROP;
         goto next;
-    case 11: // 1+
-        T=T+1;
+    case 11: // +
+        T=T+stack[--S];
+        goto next;
+    case 12: // and
+        T=T&stack[--S];
+        goto next;
+    case 13: // or
+        T=T|stack[--S];
+        goto next;
+    case 14: // xor
+        T=T^stack[--S];
         goto next;
     default:
         // should we abort here?

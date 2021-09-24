@@ -47,9 +47,12 @@ include ./vtags.fs use-tags
 $8000 constant target-size
 
 include ./compiler.fs
-\ include ./core.fs  \ core Forth words
-include ./main.fs  \ application code, ends with go
+include ./core.fs  \ core Forth words
+include ./main.fs  \ application code
 
-host : .stack  depth if  >red  then  .s >black cr ;
-report save host .( Host stack= ) .stack
+headers \ tack headers into end of dictionary
+host
+: .stack  depth if  >red  then  .s >black cr ;
+: check  target-image 512 dump ;
+report save .( Host stack= ) .stack .words check
 

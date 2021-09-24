@@ -109,7 +109,6 @@ create _comma  3 c, 32 c, char , c, 32 c,
     s" };" spit crlf
 	save-fid close-file abort" Error closing memory.h" ;
 
-0 [if]
 \ ----- Headers on the target ----- /
 variable thp
 create target-heads target-size allot
@@ -128,13 +127,4 @@ warn
 	abort" Target memory overflow"
 	thp @ target here host dup to heads there headsize move
 	headsize tdp +! ;
-
-0 value save-fid
-: save  (  - )
-	0 to save-fid   s" chip.bin" delete-file drop
-	s" chip.bin" r/w create-file abort" Error creating chip.bin"
-	to save-fid target-image target-size
-	save-fid write-file abort" Error writing chip.bin"
-	save-fid close-file abort" Error closing chip.bin" ;
-[then]
 

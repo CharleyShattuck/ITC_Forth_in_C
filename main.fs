@@ -20,49 +20,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 
 [then]
-warnings off
-host 
-: code  
-   \ make a label and restore input stream
-   host >in @ label >in !
-   \ make a word in the host and remember current target address
-   create target here 2/ host ,  \ code memory is word addressed
-      \ suppress optimizations and switch to target vocab (postponed),
-      hide postpone target
-   \ runtime behavior is to lay down a code field in the target
-   does> @ ,-t ;
-: turnkey target here 2/ 0 !-t ;
+\ warnings off
 
-target 2 org \ target-image is byte addressed here on the Forth side
-code exit  1 ,
-code emit  2 ,
-code ms  3 ,
-code branch  4 ,
-code 0branch  5 ,
-code lit ( c)  6 ,
-code . ( n)  7 ,
-code .s  8 ,
-code dup ( n - n)  9 ,
-code drop ( n)  10 ,
-code + ( n1 n2 - n3)  11 ,
-code and ( n1 n2 - n3)  12 ,
-code or ( n1 n2 - n3)  13 ,
-code xor ( n1 n2 - n3)  14 ,
-\ think of #, as a literal instruction in an assembler
-code key (  - c)  15 ,
-:m #, ( a)  lit , m;
-:m begin (  - a)  here m;
-:m again ( a)  branch [ 2/ ] , m;
-:m until ( a)  0branch [ 2/ ] , m;
-:m then ( a)  here [ 2/ swap ] !-t ;
-:m if ( - a)  0branch begin 0 , m;
-:m while ( a1 - a2 a1)  if [ swap ] m;
-:m repeat ( a1 a2 - )  again then m;
-:m :  code  0 , m;
-:m ;  exit m;
-
-: space  32 #, emit ;
-: cr  13 #, emit 10 #, emit ;
 : wait  1000 #, ms ;
 turnkey
 \    begin wait 10 #, 
@@ -71,7 +30,4 @@ turnkey
 \        repeat drop cr
 \    again
     begin key 1 #, + emit again
-
-:m check  target-image 128 dump m;
-.words check
 

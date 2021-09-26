@@ -38,9 +38,9 @@ target 2 org \ target-image is byte addressed here on the Forth side
 code exit  1 ,
 code emit  2 ,
 code ms  3 ,
-code branch  4 ,
-code 0branch  5 ,
-code lit ( c)  6 ,
+-code branch  4 ,
+-code 0branch  5 ,
+-code lit ( c)  6 ,
 code . ( n)  7 ,
 code .s  8 ,
 code dup ( n - n)  9 ,
@@ -50,6 +50,8 @@ code and ( n1 n2 - n3)  12 ,
 code or ( n1 n2 - n3)  13 ,
 code xor ( n1 n2 - n3)  14 ,
 code key (  - c)  15 ,
+code execute ( a)  16 ,
+
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;
 :m begin (  - a)  here m;
@@ -59,7 +61,8 @@ code key (  - c)  15 ,
 :m if ( - a)  0branch begin 0 , m;
 :m while ( a1 - a2 a1)  if [ swap ] m;
 :m repeat ( a1 a2 - )  again then m;
-:m :  code  0 , m;
+:m -:  -code  0 , m;
+:m :  -: header m;
 :m ;  exit m;
 
 : space  32 #, emit ;

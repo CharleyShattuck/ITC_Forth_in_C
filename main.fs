@@ -29,5 +29,7 @@ turnkey
 \        while [ char C ] #, emit wait
 \        repeat drop cr
 \    again
-    begin key 1 #, + emit again
+\    begin key 1 #, + emit again
+
+    65 #, begin  dup 1 #, + 8 #, execute cr  wait again
 

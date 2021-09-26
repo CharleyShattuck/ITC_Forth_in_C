@@ -47,6 +47,7 @@ void loop () {
   I=pgm_read_word(&memory[0]);
 next: 
   W=pgm_read_word(&memory[I++]);
+ex:
   switch (pgm_read_word(&memory[W])) {
     case 0: // enter
         --R=I;
@@ -110,6 +111,10 @@ next:
         while (!Serial.available());
         T=Serial.read();
         goto next;
+    case 16: // execute
+        W=pgm_read_word(&memory[T]);
+        DROP;
+        goto ex;
     default:
         // should we abort here?
         goto next;

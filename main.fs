@@ -24,12 +24,17 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 
 : wait  1000 #, ms ;
 turnkey
-\    begin wait 10 #, 
-\        begin -1 #, + dup
-\        while [ char C ] #, emit wait
-\        repeat drop cr
-\    again
-\    begin key 1 #, + emit again
-
-    65 #, begin  dup 1 #, + 8 #, execute cr  wait again
+    10000 #, ms 0 #, 
+    10 #, 0 #, c!
+    9 #, 1 #, c!
+    8 #, 2 #, c!
+    7 #, 3 #, c!
+    6 #, 4 #, c!
+    5 #, 5 #, c!
+    4 #, 6 #, c!
+    3 #, 7 #, c!
+    2 #, 8 #, c!
+    1 #, 9 #, c!
+    0 #, 10 #, c!
+    begin dup . dup c@ . 1 #, + cr wait again
 

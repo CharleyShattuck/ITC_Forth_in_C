@@ -11,12 +11,25 @@ int stack [STKSIZE];
 #define DROP T=stack[--S]
 #define DUP stack[S++]=T
 
+// unsigned char ram[1024];
+unsigned char ram[]={
+    1, 0,
+    2, 0,
+    3, 0,
+    4, 0,
+    5, 0,
+    6, 0,
+    7, 0,
+    8, 0,
+    9, 0,
+};
+
 // Forth registers
 int W=0; // working register
 int I=0; // instruction pointer
 int S=0; // data stack pointer
 int R=0; // return stack pointer
-int T=0; // top of stack, cached
+int T=0; // top of stack, cached be
 
 void dotS () {
     switch(S) {
@@ -24,15 +37,15 @@ void dotS () {
         Serial.print("empty ");
         return;
     case 1:
-        Serial.print(T);
+        Serial.print(T, HEX);
         Serial.print(' ');
         return;
     default:
         for (int i=1; i<S; i++) {
-            Serial.print(stack[i]);
+            Serial.print(stack[i], HEX);
             Serial.print(' ');
         }
-        Serial.print(T);
+        Serial.print(T, HEX);
         Serial.print(' ');
     }
 }
@@ -81,7 +94,7 @@ ex:
         T=pgm_read_word(&memory[I++]);
         goto next;
     case 7: // .
-        Serial.print(T);
+        Serial.print(T, HEX);
         Serial.print(' ');
         DROP;
         goto next;
@@ -115,6 +128,25 @@ ex:
         W=pgm_read_word(&memory[T]);
         DROP;
         goto ex;
+    case 17: // @p
+        W=T;
+        T=pgm_read_word(&memory[W]);
+        goto next;
+    case 18: // c@
+        W=T;
+        T=ram[W];
+        goto next;
+    case 19: // @
+        W=T;
+        T=ram[W++];
+        T|=ram[W];
+        goto next;
+    case 20: // c!
+        W=T;
+        DROP;
+        ram[W]=T;
+        DROP;
+        goto next;
     default:
         // should we abort here?
         goto next;

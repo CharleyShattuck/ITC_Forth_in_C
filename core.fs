@@ -51,6 +51,10 @@ code or ( n1 n2 - n3)  13 ,
 code xor ( n1 n2 - n3)  14 ,
 code key (  - c)  15 ,
 code execute ( a)  16 ,
+code @p ( a - n)  17 ,
+code c@ ( a - c)  18 ,
+code @ ( a - c)  19 ,
+code c! ( c a - )  20 ,
 
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;

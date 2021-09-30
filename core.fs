@@ -55,6 +55,11 @@ code @p ( a - n)  17 ,
 code c@ ( a - c)  18 ,
 code @ ( a - c)  19 ,
 code c! ( c a - )  20 ,
+code ! ( n a - )  21 ,
+code >r ( n - )  22 ,
+code r> (  - n)  23 ,
+code r@ (  - n)  24 ,
+-code (next)  25 ,
 
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;
@@ -65,6 +70,8 @@ code c! ( c a - )  20 ,
 :m if ( - a)  0branch begin 0 , m;
 :m while ( a1 - a2 a1)  if [ swap ] m;
 :m repeat ( a1 a2 - )  again then m;
+:m for  >r begin m;
+:m next  (next) [ 2/ ] , m;
 :m -:  -code  0 , m;
 :m :  -: header m;
 :m ;  exit m;

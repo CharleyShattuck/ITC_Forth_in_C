@@ -23,9 +23,10 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 \ warnings off
 : wait  1000 #, ms ;
 turnkey
-    5000 #, ms
+    wait 
     0 #, for r@ . next cr
     begin
-        5 #, for  r@ . next cr wait
+        5 #, for  r@ . next cr .s cr
+        @pe . cr wait
     again
 

@@ -60,6 +60,7 @@ code >r ( n - )  22 ,
 code r> (  - n)  23 ,
 code r@ (  - n)  24 ,
 -code (next)  25 ,
+code @pe ( - n)  26 ,
 
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;

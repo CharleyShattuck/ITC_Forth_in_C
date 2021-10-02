@@ -1,5 +1,6 @@
 // ITC.ino  Indirect Threaded Forth
 
+#include <Wire.h>
 #include "memory.h"
 // #include <Keyboard.h>  // HID
 // #include <Wire.h>      // i2c
@@ -43,9 +44,32 @@ void dotS () {
         Serial.print(' ');
     }
 }
- 
+
+void i2cInit(){
+    Wire.begin();
+    Wire.beginTransmission(0x20);
+    Wire.write(0x0c); // GPPUA
+    Wire.write(0xff);
+    Wire.write(0xff);
+    Wire.endTransmission();
+}
+
+void i2cRead(){
+    DUP;
+    Wire.beginTransmission(0x20);
+    Wire.write(0x12); // GPIOA
+    Wire.endTransmission();
+    Wire.requestFrom(0x20, 2);
+    T = Wire.read();
+    W = Wire.read();
+    T |= W << 8;
+    T ^= 0xffff;
+}
+
 void setup() {
   Serial.begin (9600);
+  i2cInit();
+  delay(3000);
 }
 
 // code words all in one function
@@ -171,6 +195,9 @@ ex:
         }
         R-=1;
         I+=1;
+        goto next;
+   case 26: // @pe port expander
+        i2cRead();
         goto next;
     default:
         // should we abort here?

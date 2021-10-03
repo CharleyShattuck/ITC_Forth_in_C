@@ -64,6 +64,7 @@ code @pe (  - n)  26 ,
 code @pin (  - n)  27 ,
 code pinMode ( mode pin - )  28 ,
 code !pin ( value pin - )  29 ,
+code 2* ( n1 - n2)  30 ,
 
 0 constant INPUT
 1 constant OUTPUT

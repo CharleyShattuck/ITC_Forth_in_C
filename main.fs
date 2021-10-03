@@ -22,6 +22,13 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 [then]
 \ warnings off
 : wait  1000 #, ms ;
+: next-pin ( n1 pin - n2)  @pin or 2* ;
+: read-raw-keys (  - n)
+    23 #, @pin 2*   22 #, next-pin  21 #, next-pin
+    20 #, next-pin  19 #, next-pin  12 #, next-pin
+    11 #, next-pin  10 #, next-pin
+    9 #, @pin or  $1ff #, xor ;
+
 turnkey
     wait 
     INPUT_PULLUP #,  9 #, pinMode
@@ -33,12 +40,8 @@ turnkey
     INPUT_PULLUP #, 21 #, pinMode
     INPUT_PULLUP #, 22 #, pinMode
     INPUT_PULLUP #, 23 #, pinMode
-\    0 #, for r@ . next cr
     begin
-\        5 #, for  r@ . next cr .s cr
-        @pe .
-        9 #, @pin . 10 #, @pin . 11 #, @pin . 12 #, @pin . 
-        19 #, @pin . 20 #, @pin . 21 #, @pin . 22 #, @pin . 
-        23 #, @pin . cr wait
+        @pe . read-raw-keys . cr
+        wait
     again
 

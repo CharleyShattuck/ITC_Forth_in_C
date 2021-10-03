@@ -200,7 +200,7 @@ ex:
     case 27: // @pin
         W=T;
         T=digitalRead(W);
-        T^=1;
+//        T^=1;
         goto next;
     case 28: // pinMode
         W=T;
@@ -212,6 +212,9 @@ ex:
         DROP;
         digitalWrite(W, T);
         DROP;
+        goto next;
+    case 30: // 2*
+        T*=2;
         goto next;
     default:
         // should we abort here?

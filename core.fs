@@ -60,7 +60,17 @@ code >r ( n - )  22 ,
 code r> (  - n)  23 ,
 code r@ (  - n)  24 ,
 -code (next)  25 ,
-code @pe ( - n)  26 ,
+code @pe (  - n)  26 ,
+code @pin (  - n)  27 ,
+code pinMode ( mode pin - )  28 ,
+code !pin ( value pin - )  29 ,
+
+0 constant INPUT
+1 constant OUTPUT
+2 constant INPUT_PULLUP
+
+\ HIGH
+\ LOW
 
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;

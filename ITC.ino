@@ -20,11 +20,11 @@ int rstack[RSTKSIZE];
 unsigned char ram[1024];
 
 // Forth registers
-int W=0; // working register
-int I=0; // instruction pointer
-int S=0; // data stack pointer
-int R=0; // return stack pointer
-int T=0; // top of stack, cached be
+unsigned int W=0; // working register
+unsigned int I=0; // instruction pointer
+unsigned int S=0; // data stack pointer
+unsigned int R=0; // return stack pointer
+unsigned int T=0; // top of stack, cached be
 
 void dotS () {
     switch(S) {
@@ -32,15 +32,15 @@ void dotS () {
         Serial.print("empty ");
         return;
     case 1:
-        Serial.print(T, HEX);
+        Serial.print(T);
         Serial.print(' ');
         return;
     default:
         for (int i=1; i<S; i++) {
-            Serial.print(stack[i], HEX);
+            Serial.print(stack[i]);
             Serial.print(' ');
         }
-        Serial.print(T, HEX);
+        Serial.print(T);
         Serial.print(' ');
     }
 }
@@ -81,12 +81,10 @@ next:
 ex:
   switch (pgm_read_word(&memory[W])) {
     case 0: // enter
-//        --R=I;
         rstack[R++]=I;
         I=++W;
         goto next;
     case 1: // exit
-//        I=R++;
         I=rstack[--R];
         goto next;
     case 2: // emit
@@ -196,8 +194,24 @@ ex:
         R-=1;
         I+=1;
         goto next;
-   case 26: // @pe port expander
+    case 26: // @pe port expander
         i2cRead();
+        goto next;
+    case 27: // @pin
+        W=T;
+        T=digitalRead(W);
+        T^=1;
+        goto next;
+    case 28: // pinMode
+        W=T;
+        DROP;
+        pinMode(W, T);
+        DROP;
+    case 29: // !pin
+        W=T;
+        DROP;
+        digitalWrite(W, T);
+        DROP;
         goto next;
     default:
         // should we abort here?

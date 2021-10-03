@@ -24,9 +24,21 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 : wait  1000 #, ms ;
 turnkey
     wait 
-    0 #, for r@ . next cr
+    INPUT_PULLUP #,  9 #, pinMode
+    INPUT_PULLUP #, 10 #, pinMode
+    INPUT_PULLUP #, 11 #, pinMode
+    INPUT_PULLUP #, 12 #, pinMode
+    INPUT_PULLUP #, 19 #, pinMode
+    INPUT_PULLUP #, 20 #, pinMode
+    INPUT_PULLUP #, 21 #, pinMode
+    INPUT_PULLUP #, 22 #, pinMode
+    INPUT_PULLUP #, 23 #, pinMode
+\    0 #, for r@ . next cr
     begin
-        5 #, for  r@ . next cr .s cr
-        @pe . cr wait
+\        5 #, for  r@ . next cr .s cr
+        @pe .
+        9 #, @pin . 10 #, @pin . 11 #, @pin . 12 #, @pin . 
+        19 #, @pin . 20 #, @pin . 21 #, @pin . 22 #, @pin . 
+        23 #, @pin . cr wait
     again
 

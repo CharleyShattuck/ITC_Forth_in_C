@@ -60,11 +60,23 @@ code >r ( n - )  22 ,
 code r> (  - n)  23 ,
 code r@ (  - n)  24 ,
 -code (next)  25 ,
-code @pe (  - n)  26 ,
+code @MCP23017 (  - n)  26 ,
 code @pin (  - n)  27 ,
 code pinMode ( mode pin - )  28 ,
 code !pin ( value pin - )  29 ,
-code 2* ( n1 - n2)  30 ,
+code true (  - $ffff)  30 ,
+code false (  - 0)  31 ,
+code over ( a b - a b a)  32 ,
+code S@ (  - n)  33 ,
+code @pins (  - n)  34 ,
+code swap ( a b - b a)  35 ,
+code rot ( a b c - b c a)  36 ,
+code 2* ( n1 - n2)  37 ,
+code 0= ( n - flag)  38 ,
+code 0< ( n - flag)  39 ,
+code - ( n1 n2 - n3)  40 ,
+code = ( n1 n2 - flag)  41 ,
+code (#+) ( n1 - n2)  42 ,
 
 0 constant INPUT
 1 constant OUTPUT
@@ -75,6 +87,8 @@ code 2* ( n1 - n2)  30 ,
 
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;
+:m #+ ( n1 - n2)  (#+) , m;
+:m 1+ ( n1 - n2)  1 #+ m;
 :m begin (  - a)  here m;
 :m again ( a)  branch [ 2/ ] , m;
 :m until ( a)  0branch [ 2/ ] , m;
@@ -90,4 +104,8 @@ code 2* ( n1 - n2)  30 ,
 
 : space  32 #, emit ;
 : cr  13 #, emit 10 #, emit ;
+: count ( a1 - a2 c)  dup 1+ swap c@ ;
+: type ( a l - )  -1 #+ for
+        dup c@ emit 1+
+    next drop ;
 

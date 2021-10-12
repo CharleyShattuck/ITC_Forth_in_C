@@ -22,15 +22,28 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 [then]
 \ warnings off
 : wait  1000 #, ms ;
-: next-pin ( n1 pin - n2)  @pin or 2* ;
-: read-raw-keys (  - n)
-    23 #, @pin 2*   22 #, next-pin  21 #, next-pin
-    20 #, next-pin  19 #, next-pin  12 #, next-pin
-    11 #, next-pin  10 #, next-pin
-    9 #, @pin or  $1ff #, xor ;
+: read-all (  - n1 n2)  @pins @MCP23017 ;
+: pressed? ( n1 n2 - n1 n2 flag)  over over or ;
+: 2drop  drop drop ;
+: 2or  rot or >r or r> ;
+: press 
+    begin read-all pressed? 0= while 2drop repeat 2drop ;
+: waiting (  - n1 n2)
+    begin press 30 #, ms read-all pressed? 0= while 2drop repeat ;
+: accumulate ( n1 n2 - n3 n4)
+    begin read-all pressed? while 2or repeat 2drop ;
+ 
+\ : scan (  - n1 n2)
+\    begin
+\        begin read-all pressed? 0= while drop drop repeat
+\        10 #, ms read-all pressed? 0= while  drop drop drop drop
+\    repeat  rot or >r or r>
+\    begin read-all pressed? while rot or >r or r> repeat
+\    drop drop ;
+
 
 turnkey
-    wait 
+    wait
     INPUT_PULLUP #,  9 #, pinMode
     INPUT_PULLUP #, 10 #, pinMode
     INPUT_PULLUP #, 11 #, pinMode
@@ -40,8 +53,8 @@ turnkey
     INPUT_PULLUP #, 21 #, pinMode
     INPUT_PULLUP #, 22 #, pinMode
     INPUT_PULLUP #, 23 #, pinMode
-    begin
-        @pe . read-raw-keys . cr
-        wait
-    again
+    3 #, 0 #, c! char a #, 1 #, c!
+    char r #, 2 #, c! char t #, 3 #, c!
+    0 #, count type cr
+    cr .s cr begin again
 

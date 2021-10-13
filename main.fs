@@ -32,6 +32,7 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
     begin press 30 #, ms read-all pressed? 0= while 2drop repeat ;
 : accumulate ( n1 n2 - n3 n4)
     begin read-all pressed? while 2or repeat 2drop ;
+
 : tib (  - a)  0 #, ;
 : tib! ( c)  tib dup c@ 1+ over c! dup c@ + c! ;
 : query

@@ -54,5 +54,5 @@ headers \ tack headers into end of dictionary
 host
 : .stack  depth if  >red  then  .s >black cr ;
 : check  target-image 512 dump ;
-report save .( Host stack= ) .stack .words  cr \ check
+report save .( Host stack= ) .stack .words  cr check
 

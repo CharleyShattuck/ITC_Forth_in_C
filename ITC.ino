@@ -1,6 +1,6 @@
 // ITC.ino  Indirect Threaded Forth
 
-#include <Wire.h>
+// #include <Wire.h>
 #include "memory.h"
 // #include <Keyboard.h>  // HID
 // #include <Wire.h>      // i2c
@@ -45,6 +45,7 @@ void dotS () {
     }
 }
 
+/*
 void i2cInit(){
     Wire.begin();
     Wire.beginTransmission(0x20);
@@ -53,7 +54,9 @@ void i2cInit(){
     Wire.write(0xff);
     Wire.endTransmission();
 }
+*/
 
+/*
 void i2cRead(){
     DUP;
     Wire.beginTransmission(0x20);
@@ -65,10 +68,11 @@ void i2cRead(){
     T |= W << 8;
     T ^= 0xffff;
 }
+*/
 
 void setup() {
   Serial.begin (9600);
-  i2cInit();
+//  i2cInit();
   delay(3000);
 }
 
@@ -209,7 +213,7 @@ ex:
         I+=1;
         goto next;
     case 26: // @pe port expander
-        i2cRead();
+//        i2cRead();
         goto next;
     case 27: // @pin
         W=T;
@@ -279,6 +283,11 @@ FALSE:  T=0;
         W=pgm_read_word(&memory[I++]);
         T+=W;
         goto next;
+    case 43: // <
+        W=T;
+        DROP;
+        if(T<N) goto TRUE;
+        goto FALSE;
     default:
         // should we abort here?
         goto next;

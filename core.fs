@@ -77,6 +77,7 @@ code 0< ( n - flag)  39 ,
 code - ( n1 n2 - n3)  40 ,
 code = ( n1 n2 - flag)  41 ,
 code (#+) ( n1 - n2)  42 ,
+code < ( a b - c)  43 ,
 
 0 constant INPUT
 1 constant OUTPUT
@@ -108,4 +109,7 @@ code (#+) ( n1 - n2)  42 ,
 : type ( a l - )  -1 #+ for
         dup c@ emit 1+
     next drop ;
+: BL  32 #, ;
+: max ( a b - c)  over over < if swap then drop ;
+: dict (  - a)  0 #, ;
 

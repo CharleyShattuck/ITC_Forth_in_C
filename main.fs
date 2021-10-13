@@ -32,7 +32,15 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
     begin press 30 #, ms read-all pressed? 0= while 2drop repeat ;
 : accumulate ( n1 n2 - n3 n4)
     begin read-all pressed? while 2or repeat 2drop ;
- 
+: tib (  - a)  0 #, ;
+: tib! ( c)  tib dup c@ 1+ over c! dup c@ + c! ;
+: query
+    0 #, tib ! 
+    begin key BL max dup emit BL xor dup while
+        BL xor tib! repeat drop ; 
+: show  0 #, 10 #, for dup c@ . 1+ next drop cr ;
+: test  begin query tib count type cr .s cr cr show cr again
+
 \ : scan (  - n1 n2)
 \    begin
 \        begin read-all pressed? 0= while drop drop repeat
@@ -41,20 +49,19 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 \    begin read-all pressed? while rot or >r or r> repeat
 \    drop drop ;
 
-
 turnkey
     wait
-    INPUT_PULLUP #,  9 #, pinMode
-    INPUT_PULLUP #, 10 #, pinMode
-    INPUT_PULLUP #, 11 #, pinMode
-    INPUT_PULLUP #, 12 #, pinMode
-    INPUT_PULLUP #, 19 #, pinMode
-    INPUT_PULLUP #, 20 #, pinMode
-    INPUT_PULLUP #, 21 #, pinMode
-    INPUT_PULLUP #, 22 #, pinMode
-    INPUT_PULLUP #, 23 #, pinMode
-    3 #, 0 #, c! char a #, 1 #, c!
-    char r #, 2 #, c! char t #, 3 #, c!
-    0 #, count type cr
-    cr .s cr begin again
+\    INPUT_PULLUP #,  9 #, pinMode
+\    INPUT_PULLUP #, 10 #, pinMode
+\    INPUT_PULLUP #, 11 #, pinMode
+\    INPUT_PULLUP #, 12 #, pinMode
+\    INPUT_PULLUP #, 19 #, pinMode
+\    INPUT_PULLUP #, 20 #, pinMode
+\    INPUT_PULLUP #, 21 #, pinMode
+\    INPUT_PULLUP #, 22 #, pinMode
+\    INPUT_PULLUP #, 23 #, pinMode
+\    65 #, 0 #, c! show 0 #, tib !
+\    key tib! key tib! key tib! show
+    test
+    .s cr begin again
 

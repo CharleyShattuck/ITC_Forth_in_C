@@ -21,7 +21,7 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 
 [then]
 warnings off
-host 
+host
 : -code  
    \ make a label and restore input stream
    host >in @ label >in !
@@ -78,11 +78,17 @@ code - ( n1 n2 - n3)  40 ,
 code = ( n1 n2 - flag)  41 ,
 code (#+) ( n1 - n2)  42 ,
 code < ( a b - c)  43 ,
+code p! ( a - )  44 ,
+code p (  - a)  45 ,
+code @p+ (  - a)  46 ,
+code @+ (  - a)  47 ,
+code c@+ (  - c)  48 ,
+code a! ( a - )  49 ,
+code a  (  - a)  50 ,
 
 0 constant INPUT
 1 constant OUTPUT
 2 constant INPUT_PULLUP
-
 \ HIGH
 \ LOW
 
@@ -92,6 +98,7 @@ code < ( a b - c)  43 ,
 :m 1+ ( n1 - n2)  1 #+ m;
 :m begin (  - a)  here m;
 :m again ( a)  branch [ 2/ ] , m;
+\ 0branch doesn't drop the stack
 :m until ( a)  0branch [ 2/ ] , m;
 :m then ( a)  here [ 2/ swap ] !-t ;
 :m if ( - a)  0branch begin 0 , m;
@@ -110,6 +117,8 @@ code < ( a b - c)  43 ,
         dup c@ emit 1+
     next drop ;
 : BL  32 #, ;
-: max ( a b - c)  over over < if swap then drop ;
-: dict (  - a)  0 #, ;
+\ : max ( a b - c)  over over < if swap then drop ;
+: max ( a b - c)  over over < if
+        drop swap drop exit
+    then drop drop ;
 

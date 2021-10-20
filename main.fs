@@ -26,18 +26,21 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 : pressed? ( n1 n2 - n1 n2 flag)  over over or ;
 : 2drop  drop drop ;
 : 2or  rot or >r or r> ;
-: press 
-    begin read-all pressed? 0= while 2drop repeat 2drop ;
-: waiting (  - n1 n2)
-    begin press 30 #, ms read-all pressed? 0= while 2drop repeat ;
-: accumulate ( n1 n2 - n3 n4)
-    begin read-all pressed? while 2or repeat 2drop ;
+\ : press 
+\    begin read-all pressed? 0= while 2drop repeat 2drop ;
+\ : waiting (  - n1 n2)
+\    begin press 30 #, ms read-all pressed? 0= while 2drop repeat ;
+\ : accumulate ( n1 n2 - n3 n4)
+\    begin read-all pressed? while 2or repeat 2drop ;
 
+here [ 4 + constant dict ]
+: dictionary  $a5 #, p! ;
+-: match ( fa ra - flag)  ;
 : tib (  - a)  0 #, ;
 : tib! ( c)  tib dup c@ 1+ over c! dup c@ + c! ;
 : query
     0 #, tib ! 
-    begin key BL max dup emit BL xor dup while
+    begin key BL max dup emit BL xor while
         BL xor tib! repeat drop ; 
 : show  0 #, 10 #, for dup c@ . 1+ next drop cr ;
 : test  begin query tib count type cr .s cr cr show cr again
@@ -63,6 +66,9 @@ turnkey
 \    INPUT_PULLUP #, 23 #, pinMode
 \    65 #, 0 #, c! show 0 #, tib !
 \    key tib! key tib! key tib! show
-    test
-    .s cr begin again
+\    test
+    dictionary p . @p+ . @p+ . @p+ . @p+ .
+\    .s 0 #, p! p .
+\    @p+ . @p+ . @p+ . p .
+    cr .s cr begin again
 

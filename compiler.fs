@@ -33,20 +33,16 @@ host
 warn
 
 : :m postpone target : ;
-: m; postpone ; ( postpone host) ; immediate
+: m; postpone ; ; immediate
 
 :m words  words m;
 
 \ as far as gforth is concerned, the target image is byte addressed
-\ even though the AVR memory is word addressed. Branches addresses
+\ even though the AVR memory is word addressed. Branch addresses
 \ need to be word addressed, so begin = here 2/ for example
-\ 0 constant start  \ Reset vector.
-\ 8192 constant target-size
 create target-image target-size allot
 target-image target-size $ff fill  \ ROM erased.
-: there   ( a1 - a2)   target-image + ( start +) ;
-\ : c!-t   ( c a - )   there c! ;
-\ : c@-t   ( a - c)   there c@ ;
+: there   ( a1 - a2)   target-image + ;
 : !-t  ( n a - )   there over 8 rshift over 1 + c! c! ;
 : @-t  ( a - n)  there count swap c@ 8 lshift + ;
 
@@ -58,10 +54,10 @@ variable tdp  \ Rom pointer.
 : ,-t   ( n - )   target , m;
 : report  cr ." HERE=" target HERE host u. cr ;
 
-\ variable trp  \ Ram pointer.
-\ : cpuHERE  (  - a)   trp @ ;
-\ : cpuORG  ( a - )  trp ! ;  $100 cpuORG
-\ : cpuALLOT  ( n - )  trp +! ;
+variable trp  \ Ram pointer.
+: cpuHERE  (  - a)   trp @ ;
+: cpuORG  ( a - )  trp ! ; 0 cpuORG
+: cpuALLOT  ( n - )  trp +! ;
 
 \ ----- Optimization ----- /
 variable 'edge

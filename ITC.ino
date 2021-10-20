@@ -25,6 +25,8 @@ unsigned int S=0; // data stack pointer
 unsigned int R=0; // return stack pointer
 unsigned int T=0; // top of stack, cached
 unsigned int N=0; // next on stack, not cached
+unsigned int A=0; // RAM address register
+unsigned int P=0; // program address register
 
 void dotS () {
     switch(S) {
@@ -119,11 +121,9 @@ ex:
     case 5: // 0branch
         if(T==0) {
             I=pgm_read_word(&memory[I]);
-            DROP;
             goto next;
         }
         I+=1;
-        DROP;
         goto next;
     case 6: // lit
         DUP;
@@ -277,7 +277,7 @@ FALSE:  T=0;
         goto next;
     case 41: // =
         T=T-stack[--S];
-        if(T=0) goto FALSE;
+        if(T==0) goto FALSE;
         goto TRUE;
     case 42: // (#+)
         W=pgm_read_word(&memory[I++]);
@@ -286,8 +286,37 @@ FALSE:  T=0;
     case 43: // <
         W=T;
         DROP;
-        if(T<N) goto TRUE;
+        if(T<W) goto TRUE;
         goto FALSE;
+    case 44: // p!
+        P=T;
+        DROP;
+        goto next;
+    case 45: // p
+        DUP;
+        T=P;
+        goto next;
+    case 46: // @p+
+        DUP;
+        T=pgm_read_word(&memory[P++]);
+        goto next;
+    case 47: // @+
+        DUP;
+        T=ram[A++];
+        T|=ram[A++]<<8;
+        goto next;
+    case 48: // c@+
+        DUP;
+        T=ram[A++];
+        goto next;
+    case 49: // a!
+        A=T;
+        DROP;
+        goto next;
+    case 50: // a
+        DUP;
+        T=A;
+        goto next;
     default:
         // should we abort here?
         goto next;

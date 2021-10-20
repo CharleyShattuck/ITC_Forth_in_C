@@ -51,8 +51,11 @@ include ./core.fs  \ core Forth words
 include ./main.fs  \ application code
 
 headers \ tack headers into end of dictionary
-host
+host heads 2/ dict !-t \ patch start of dictionary
+
 : .stack  depth if  >red  then  .s >black cr ;
-: check  target-image 512 dump ;
-report save .( Host stack= ) .stack .words  cr check
+: check  target-image 1024 dump ;
+report save .( Host stack= ) .stack .words
+host cr hex heads 2/ u. decimal
+cr \ check cr
 

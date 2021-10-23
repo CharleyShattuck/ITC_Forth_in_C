@@ -35,16 +35,28 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 
 here [ 4 + constant dict ]
 : dictionary  $a5 #, p! ;
--: match ( fa ra - flag)  ;
 : tib (  - a)  0 #, ;
 : tib! ( c)  tib dup c@ 1+ over c! dup c@ + c! ;
+: echo ( c - c)  dup emit ;
 : query
-    0 #, tib ! 
-    begin key BL max dup emit BL xor while
-        BL xor tib! repeat drop ; 
-: show  0 #, 10 #, for dup c@ . 1+ next drop cr ;
-: test  begin query tib count type cr .s cr cr show cr again
+    0 #, tib ! false
+    begin drop key BL max BL xor until BL xor echo tib!
+    begin key BL max BL xor while BL xor echo tib! repeat
+    drop BL tib dup c@ + 1+ c! ;
+: match (  - 0|n)  \ P has been loaded
+    tib a! false p @p $ff #, and 2/ for @+ @p+ - or next
+    @p+ swap if 2drop false exit then drop ; 
+: find (  - a|0)
+    dictionary  \ loads P register
+    begin p @p while drop
+        tib a! match if exit then drop
+    repeat ;
+: interpret
+    begin cr .s cr query space find execute again
 
+$ffff , $ffff ,
+: this char A #, emit char B #, emit char C #, emit cr ;
+$ffff , $ffff ,
 \ : scan (  - n1 n2)
 \    begin
 \        begin read-all pressed? 0= while drop drop repeat
@@ -64,11 +76,8 @@ turnkey
 \    INPUT_PULLUP #, 21 #, pinMode
 \    INPUT_PULLUP #, 22 #, pinMode
 \    INPUT_PULLUP #, 23 #, pinMode
-\    65 #, 0 #, c! show 0 #, tib !
-\    key tib! key tib! key tib! show
-\    test
-    dictionary p . @p+ . @p+ . @p+ . @p+ .
-\    .s 0 #, p! p .
-\    @p+ . @p+ . @p+ . p .
-    cr .s cr begin again
+\    begin query find .
+\    cr .s cr again
+    1 #, 2 #, 3 #, 3 #, 1+
+    interpret
 

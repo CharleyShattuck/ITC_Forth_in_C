@@ -85,6 +85,8 @@ code @+ (  - a)  47 ,
 code c@+ (  - c)  48 ,
 code a! ( a - )  49 ,
 code a  (  - a)  50 ,
+code 2/ ( n1 - n2)  51 ,
+code cr (  - )  52 ,
 
 0 constant INPUT
 1 constant OUTPUT
@@ -107,17 +109,16 @@ code a  (  - a)  50 ,
 :m for  >r begin m;
 :m next  (next) [ 2/ ] , m;
 :m -:  -code  0 , m;
-:m :  -: header m;
+:m :  code  0 , m;
 :m ;  exit m;
 
 : space  32 #, emit ;
-: cr  13 #, emit 10 #, emit ;
+\ : cr  13 #, emit 10 #, emit ;
 : count ( a1 - a2 c)  dup 1+ swap c@ ;
 : type ( a l - )  -1 #+ for
         dup c@ emit 1+
     next drop ;
 : BL  32 #, ;
-\ : max ( a b - c)  over over < if swap then drop ;
 : max ( a b - c)  over over < if
         drop swap drop exit
     then drop drop ;

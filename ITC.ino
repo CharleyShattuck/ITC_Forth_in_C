@@ -7,26 +7,26 @@
 // it seems that Serial.h is loaded by default
 
 // stack grows upwards, makes .s easier
-const int STKSIZE=16;
-int stack[STKSIZE];
+const u16 STKSIZE=16;
+u16 stack[STKSIZE];
 #define DROP T=stack[--S]
 #define DUP stack[S++]=T
-const int RSTKSIZE=16;
-int rstack[RSTKSIZE];
+const u16 RSTKSIZE=16;
+u16 rstack[RSTKSIZE];
 #define PUSH rstack[R++]=T
 #define POP T=rstack[--R]
 
-unsigned char ram[2048];
+u8 ram[2048];
 
 // Forth registers
-unsigned int W=0; // working register
-unsigned int I=0; // instruction pointer
-unsigned int S=0; // data stack pointer
-unsigned int R=0; // return stack pointer
-unsigned int T=0; // top of stack, cached
-unsigned int N=0; // next on stack, not cached
-unsigned int A=0; // RAM address register
-unsigned int P=0; // program address register
+u16 W=0; // working register
+u16 I=0; // instruction pointer
+u16 S=0; // data stack pointer
+u16 R=0; // return stack pointer
+u16 T=0; // top of stack, cached
+u16 N=0; // next on stack, not cached
+u16 A=0; // RAM address register
+u16 P=0; // program address register
 
 void dotS () {
     switch(S) {
@@ -99,10 +99,10 @@ void loop () {
 next: 
   W=pgm_read_word(&memory[I++]);
 ex:
-  switch (pgm_read_word(&memory[W])) {
+  switch (pgm_read_word(&memory[W++])) {
     case 0: // enter
         rstack[R++]=I;
-        I=++W;
+        I=W;
         goto next;
     case 1: // exit
         I=rstack[--R];
@@ -161,9 +161,13 @@ ex:
         T=Serial.read();
         goto next;
     case 16: // execute
-        W=pgm_read_word(&memory[T]);
+        if(T!=0) {
+            W=pgm_read_word(&memory[T]);
+            DROP;
+            goto ex;
+        }
         DROP;
-        goto ex;
+        goto next;
     case 17: // @p
         W=T;
         T=pgm_read_word(&memory[W]);
@@ -251,6 +255,7 @@ FALSE:  T=0;
         goto next;
     case 34: // readraw
         readraw();
+        goto next;
     case 35: // swap
         W=stack[S-1];
         stack[S-1]=T;
@@ -316,6 +321,12 @@ FALSE:  T=0;
     case 50: // a
         DUP;
         T=A;
+        goto next;
+    case 51: // 2/
+        T=T/2;
+        goto next;
+    case 52: // cr
+        Serial.write("\n");
         goto next;
     default:
         // should we abort here?

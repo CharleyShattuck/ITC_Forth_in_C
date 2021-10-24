@@ -34,15 +34,15 @@ void dotS () {
         Serial.print("empty ");
         return;
     case 1:
-        Serial.print(T, HEX);
+        Serial.print(T);
         Serial.print(' ');
         return;
     default:
         for (int i=1; i<S; i++) {
-            Serial.print(stack[i], HEX);
+            Serial.print(stack[i]);
             Serial.print(' ');
         }
-        Serial.print(T, HEX);
+        Serial.print(T);
         Serial.print(' ');
     }
 }
@@ -95,8 +95,12 @@ void readraw() {
 // code words all in one function
 // so we can avoid calls and just jump to next
 void loop () {
+abort:
+  S=0;
+quit:
+  R=0;
   I=pgm_read_word(&memory[0]);
-next: 
+next:
   W=pgm_read_word(&memory[I++]);
 ex:
   switch (pgm_read_word(&memory[W++])) {
@@ -130,7 +134,7 @@ ex:
         T=pgm_read_word(&memory[I++]);
         goto next;
     case 7: // .
-        Serial.print(T, HEX);
+        Serial.print(T);
         Serial.print(' ');
         DROP;
         goto next;
@@ -161,13 +165,17 @@ ex:
         T=Serial.read();
         goto next;
     case 16: // execute
-        if(T!=0) {
-            W=pgm_read_word(&memory[T]);
-            DROP;
-            goto ex;
-        }
+//        Serial.print("I= ");
+//        Serial.println(I);
+//        Serial.print("T= ");
+//        Serial.println(T);
+        if(T==0) goto abort;
+//        W=pgm_read_word(&memory[T]);
+        W=T;
+//        Serial.print("W= ");
+//        Serial.println(W);
         DROP;
-        goto next;
+        goto ex;
     case 17: // @p
         W=T;
         T=pgm_read_word(&memory[W]);
@@ -331,6 +339,11 @@ FALSE:  T=0;
     case 53: // d#
         DUP;
         T=Serial.parseInt(SKIP_WHITESPACE);
+        goto next;
+    case 54: // abort
+        goto abort;
+    case 55: // quit
+        goto quit;
     default:
         // should we abort here?
         goto next;

@@ -79,7 +79,7 @@ warn
 nowarn
 : (words  words ;
 : .words  labels begin  @ dup while  dup cell+ @ 2/
-   base @ >r hex u. r> base ! dup show 2
+   base @ >r ( hex) decimal u. r> base ! dup show 2
    spaces  repeat  drop ;
 : target-words
    labels begin  @ dup while  dup show space  repeat  drop ;

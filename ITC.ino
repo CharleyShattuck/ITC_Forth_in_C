@@ -340,11 +340,14 @@ FALSE:  T=0;
         DUP;
         T=Serial.parseInt(SKIP_WHITESPACE);
         goto next;
-    case 54: // abort
+    case 54: // huh?
+        Serial.write(" ?\n");
+// falls through into abort
+    case 55: // abort
         goto abort;
-    case 55: // quit
+    case 56: // quit
         goto quit;
-    case 56: // +branch
+    case 57: // +branch
         W=T;
         if(W&0x8000){
             I+=1;

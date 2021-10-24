@@ -52,7 +52,9 @@ here [ 4 + constant dict ]
         tib a! match if exit then drop
     repeat ;
 : interpret
-    begin cr .s cr query space find execute again
+    begin
+        begin cr .s cr query space find while execute repeat huh?
+    again
 
 $ffff , $ffff ,
 : this char A #, emit char B #, emit char C #, emit cr ;
@@ -66,8 +68,7 @@ $ffff , $ffff ,
 \    repeat  rot or >r or r>
 \    begin read-all pressed? while rot or >r or r> repeat
 \    drop drop ;
-: count-down
-    10 #, begin dup . 1- -until drop ;
+: down  10 #, begin dup . 1- -until drop ;
 turnkey
     wait
 \    INPUT_PULLUP #,  9 #, pinMode
@@ -81,7 +82,7 @@ turnkey
 \    INPUT_PULLUP #, 23 #, pinMode
 \    begin query find .
 \    cr .s cr again
-    1 #, 2 #, 3 #, 3 #, 1+
-    cr count-down
+\    1 #, 2 #, 3 #, 3 #, 1+
+\    cr down
     interpret
 

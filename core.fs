@@ -89,9 +89,10 @@ code 2/ ( n1 - n2)  51 ,
 code cr (  - )  52 ,
 \ only makes sense in the interpreter
 code d# (  - n)  53 ,
-code abort  54 ,
-code quit  55 ,
-code +branch  56 ,
+code huh?  54 ,
+code abort  55 ,
+code quit  56 ,
+code +branch  57 ,
 
 0 constant INPUT
 1 constant OUTPUT
@@ -102,7 +103,6 @@ code +branch  56 ,
 \ think of #, as a literal instruction in an assembler
 :m #, ( a)  lit , m;
 :m #+ ( n1 - n2)  (#+) , m;
-:m 1+ ( n1 - n2)  1 #+ m;
 :m begin (  - a)  here m;
 :m again ( a)  branch [ 2/ ] , m;
 \ 0branch doesn't drop the stack

@@ -328,6 +328,9 @@ FALSE:  T=0;
     case 52: // cr
         Serial.write("\n");
         goto next;
+    case 53: // d#
+        DUP;
+        T=Serial.parseInt(SKIP_WHITESPACE);
     default:
         // should we abort here?
         goto next;

@@ -57,6 +57,8 @@ here [ 4 + constant dict ]
 $ffff , $ffff ,
 : this char A #, emit char B #, emit char C #, emit cr ;
 $ffff , $ffff ,
+: one  1 #, ;
+: 'A'  $41 #, ;
 \ : scan (  - n1 n2)
 \    begin
 \        begin read-all pressed? 0= while drop drop repeat

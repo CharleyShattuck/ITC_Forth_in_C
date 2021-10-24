@@ -87,6 +87,8 @@ code a! ( a - )  49 ,
 code a  (  - a)  50 ,
 code 2/ ( n1 - n2)  51 ,
 code cr (  - )  52 ,
+\ only makes sense in the interpreter
+code d# (  - n)  53 ,
 
 0 constant INPUT
 1 constant OUTPUT

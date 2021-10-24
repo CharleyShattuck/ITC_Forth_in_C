@@ -89,6 +89,9 @@ code 2/ ( n1 - n2)  51 ,
 code cr (  - )  52 ,
 \ only makes sense in the interpreter
 code d# (  - n)  53 ,
+code abort  54 ,
+code quit  55 ,
+code +branch  56 ,
 
 0 constant INPUT
 1 constant OUTPUT
@@ -104,9 +107,12 @@ code d# (  - n)  53 ,
 :m again ( a)  branch [ 2/ ] , m;
 \ 0branch doesn't drop the stack
 :m until ( a)  0branch [ 2/ ] , m;
+:m -until ( a)  +branch [ 2/ ] , m;
 :m then ( a)  here [ 2/ swap ] !-t ;
-:m if ( - a)  0branch begin 0 , m;
+:m if (  - a)  0branch begin 0 , m;
+:m -if (  - a)  +branch begin 0 , m;
 :m while ( a1 - a2 a1)  if [ swap ] m;
+:m -while ( a1 - a2 a3)  -if [ swap ] m;
 :m repeat ( a1 a2 - )  again then m;
 :m for  >r begin m;
 :m next  (next) [ 2/ ] , m;
@@ -124,4 +130,6 @@ code d# (  - n)  53 ,
 : max ( a b - c)  over over < if
         drop swap drop exit
     then drop drop ;
+: 1+  1 #+ ;
+: 1-  -1 #+ ;
 

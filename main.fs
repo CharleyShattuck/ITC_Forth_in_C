@@ -66,7 +66,8 @@ $ffff , $ffff ,
 \    repeat  rot or >r or r>
 \    begin read-all pressed? while rot or >r or r> repeat
 \    drop drop ;
-
+: count-down
+    10 #, begin dup . 1- -until drop ;
 turnkey
     wait
 \    INPUT_PULLUP #,  9 #, pinMode
@@ -81,5 +82,6 @@ turnkey
 \    begin query find .
 \    cr .s cr again
     1 #, 2 #, 3 #, 3 #, 1+
+    cr count-down
     interpret
 

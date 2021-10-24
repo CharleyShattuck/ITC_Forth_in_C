@@ -344,6 +344,14 @@ FALSE:  T=0;
         goto abort;
     case 55: // quit
         goto quit;
+    case 56: // +branch
+        W=T;
+        if(W&0x8000){
+            I+=1;
+            goto next;
+        }
+        I=pgm_read_word(&memory[I]);
+        goto next;
     default:
         // should we abort here?
         goto next;

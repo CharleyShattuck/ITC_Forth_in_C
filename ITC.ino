@@ -355,9 +355,14 @@ FALSE:  T=0;
         }
         I=pgm_read_word(&memory[I]);
         goto next;
-    default:
-        // should we abort here?
+    case 58: // nip
+        S-=1;
         goto next;
+    case 59: // invert
+        T=T^0xffff;
+        goto next;
+    default:
+        goto abort;
   }  
 }
 

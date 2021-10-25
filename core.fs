@@ -93,6 +93,8 @@ code huh?  54 ,
 code abort  55 ,
 code quit  56 ,
 code +branch  57 ,
+code nip  58 ,
+code invert  59 ,
 
 0 constant INPUT
 1 constant OUTPUT
@@ -120,8 +122,8 @@ code +branch  57 ,
 :m :  code  0 , m;
 :m ;  exit m;
 
+: 1+  1 #+ ;
 : space  32 #, emit ;
-\ : cr  13 #, emit 10 #, emit ;
 : count ( a1 - a2 c)  dup 1+ swap c@ ;
 : type ( a l - )  -1 #+ for
         dup c@ emit 1+
@@ -130,6 +132,5 @@ code +branch  57 ,
 : max ( a b - c)  over over < if
         drop swap drop exit
     then drop drop ;
-: 1+  1 #+ ;
 : 1-  -1 #+ ;
 

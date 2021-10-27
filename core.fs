@@ -95,6 +95,8 @@ code quit  56 ,
 code +branch  57 ,
 code nip  58 ,
 code invert  59 ,
+code h.  60 ,
+code .sh  61 ,
 
 0 constant INPUT
 1 constant OUTPUT

@@ -53,7 +53,7 @@ here [ 4 + constant dict ]
     repeat ;
 : interpret
     begin
-        begin cr .s cr query space find while execute repeat huh?
+        begin ( cr .s) cr query space find while execute repeat huh?
     again
 
 $ffff , $ffff ,
@@ -69,20 +69,6 @@ $ffff , $ffff ,
 \    begin read-all pressed? while rot or >r or r> repeat
 \    drop drop ;
 : down  10 #, begin dup . 1- -until drop ;
-turnkey
-    wait
-\    INPUT_PULLUP #,  9 #, pinMode
-\    INPUT_PULLUP #, 10 #, pinMode
-\    INPUT_PULLUP #, 11 #, pinMode
-\    INPUT_PULLUP #, 12 #, pinMode
-\    INPUT_PULLUP #, 19 #, pinMode
-\    INPUT_PULLUP #, 20 #, pinMode
-\    INPUT_PULLUP #, 21 #, pinMode
-\    INPUT_PULLUP #, 22 #, pinMode
-\    INPUT_PULLUP #, 23 #, pinMode
-\    begin query find .
-\    cr .s cr again
-\    1 #, 2 #, 3 #, 3 #, 1+
-\    cr down
-    interpret
+
+turnkey wait interpret
 

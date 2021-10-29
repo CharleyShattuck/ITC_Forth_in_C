@@ -23,16 +23,15 @@ u16 W=0; // working register
 u16 I=0; // instruction pointer
 u16 S=0; // data stack pointer
 u16 R=0; // return stack pointer
-int T=0; // top of stack, cached, signed
+u16 T=0; // top of stack, cached, signed
 u16 N=0; // next on stack, not cached
 u16 A=0; // RAM address register
 u16 P=0; // program address register
 
 void dotS () {
-    W=T;
     switch(S) {
     case 0:
-        Serial.print("empty ");
+        Serial.print(" empty ");
         return;
     case 1:
         Serial.print(T);
@@ -40,32 +39,33 @@ void dotS () {
         return;
     default:
         for (int i=1; i<S; i++) {
-            T=stack[i];
-            Serial.print(T);
+            W=stack[i];
+            Serial.print(W);
             Serial.print(' ');
         }
-        T=W;
         Serial.print(T);
         Serial.print(' ');
     }
 }
 
 void dotSH () {
-    W=T;
+    Serial.print(" ");
     switch(S) {
     case 0:
-        Serial.print("empty");
+        Serial.print("empty ");
         return;
     case 1:
-        Serial.print(W, HEX);
+        Serial.print(T, HEX);
         Serial.print(' ');
         return;
     default:
-        for (int i=1; i<S; i++) {
+        for (u16 i=1; i<S; i++){
+//            W=stack[i];
+//            Serial.print(W, HEX);
             Serial.print(stack[i], HEX);
             Serial.print(' ');
         }
-        Serial.print(W, HEX);
+        Serial.print(T, HEX);
         Serial.print(' ');
     }
 }
@@ -384,8 +384,7 @@ FALSE:  T=0;
         T=T^0xffff;
         goto next;
     case 60: // h.
-        W=T;
-        Serial.print(W, HEX);
+        Serial.print(T, HEX);
         Serial.print(' ');
         DROP;
         goto next;

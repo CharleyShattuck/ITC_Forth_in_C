@@ -56,6 +56,6 @@ host heads 2/ dict !-t \ patch start of dictionary
 : .stack  depth if  >red  then  .s >black cr ;
 : check  target-image 1024 dump ;
 report save .( Host stack= ) .stack .words
-host cr hex heads 2/ u. decimal
+host cr .( heads=) hex heads 2/ u. decimal
 cr \ check cr
 

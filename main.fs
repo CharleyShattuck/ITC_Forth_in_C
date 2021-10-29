@@ -53,8 +53,12 @@ here [ 4 + constant dict ]
     repeat ;
 : interpret
     begin
-        begin ( cr .s) cr query space find while execute repeat huh?
+        begin .sh cr query space find while execute repeat
+        tib count type huh?
     again
+: digit (  - n)  key $3a #, - -if 10 #, + exit then 29 #, - ; 
+: h# (  - n)  ; 
+
 
 $ffff , $ffff ,
 : this char A #, emit char B #, emit char C #, emit cr ;

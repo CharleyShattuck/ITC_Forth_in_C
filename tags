@@ -153,9 +153,11 @@ query	main.fs	+41
 match	main.fs	+46
 find	main.fs	+49
 interpret	main.fs	+54
-this	main.fs	+60
-one	main.fs	+62
-'A'	main.fs	+63
-down	main.fs	+71
+digit	main.fs	+59
+h#	main.fs	+60
+this	main.fs	+64
+one	main.fs	+66
+'A'	main.fs	+67
+down	main.fs	+75
 .stack	job.fs	+56
 check	job.fs	+57

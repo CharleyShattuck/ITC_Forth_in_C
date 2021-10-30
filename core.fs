@@ -60,7 +60,7 @@ code >r ( n - )  22 ,
 code r> (  - n)  23 ,
 code r@ (  - n)  24 ,
 -code (next)  25 ,
-code @MCP23017 (  - n)  26 ,
+code @i2c (  - n)  26 ,
 code @pin (  - n)  27 ,
 code pinMode ( mode pin - )  28 ,
 code !pin ( value pin - )  29 ,
@@ -97,6 +97,7 @@ code nip  58 ,
 code invert  59 ,
 code h.  60 ,
 code .sh  61 ,
+code initPins  62 ,
 
 0 constant INPUT
 1 constant OUTPUT

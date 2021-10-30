@@ -1,9 +1,8 @@
 // ITC.ino  Indirect Threaded Forth
 
-// #include <Wire.h>
 #include "memory.h"
 // #include <Keyboard.h>  // HID
-// #include <Wire.h>      // i2c
+ #include <Wire.h>      // i2c
 // it seems that Serial.h is loaded by default
 
 // stack grows upwards, makes .s easier
@@ -69,7 +68,7 @@ void dotSH () {
         Serial.print(' ');
     }
 }
-/*
+
 void i2cInit(){
     Wire.begin();
     Wire.beginTransmission(0x20);
@@ -78,9 +77,8 @@ void i2cInit(){
     Wire.write(0xff);
     Wire.endTransmission();
 }
-*/
 
-/*
+
 void i2cRead(){
     DUP;
     Wire.beginTransmission(0x20);
@@ -92,15 +90,15 @@ void i2cRead(){
     T |= W << 8;
     T ^= 0xffff;
 }
-*/
 
 void setup() {
   Serial.begin (9600);
-//  i2cInit();
+  i2cInit();
+  initPins();
   delay(3000);
 }
 
-void readraw() {
+void readPins() {
     DUP;
     T=digitalRead(9);
     T|=(digitalRead(10)<<1);
@@ -112,6 +110,18 @@ void readraw() {
     T|=(digitalRead(A4)<<7);
     T|=(digitalRead(A5)<<8);
     T^=0x01ff;
+}
+
+void initPins() {
+    pinMode(9, INPUT_PULLUP);
+    pinMode(10, INPUT_PULLUP);
+    pinMode(11, INPUT_PULLUP);
+    pinMode(12, INPUT_PULLUP);
+    pinMode(A1, INPUT_PULLUP);
+    pinMode(A2, INPUT_PULLUP);
+    pinMode(A3, INPUT_PULLUP);
+    pinMode(A4, INPUT_PULLUP);
+    pinMode(A5, INPUT_PULLUP);
 }
 
 // code words all in one function
@@ -246,8 +256,8 @@ ex:
         R-=1;
         I+=1;
         goto next;
-    case 26: // @pe port expander
-//        i2cRead();
+    case 26: // @i2c port expander
+        i2cRead();
         goto next;
     case 27: // @pin
         W=T;
@@ -283,8 +293,8 @@ FALSE:  T=0;
         DUP;
         T=W;
         goto next;
-    case 34: // readraw
-        readraw();
+    case 34: // @pins 
+        readPins();
         goto next;
     case 35: // swap
         W=stack[S-1];
@@ -392,6 +402,9 @@ FALSE:  T=0;
         goto next;
     case 61: // .sh
         dotSH();
+        goto next;
+    case 62: // initPins
+        initPins();
         goto next;
     default:
         goto abort;

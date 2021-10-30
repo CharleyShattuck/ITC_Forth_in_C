@@ -22,16 +22,16 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 [then]
 \ warnings off
 : wait  1000 #, ms ;
-: read-all (  - n1 n2)  @pins @MCP23017 ;
+: keys (  - n1 n2)  @pins @i2c ;
 : pressed? ( n1 n2 - n1 n2 flag)  over over or ;
 : 2drop  drop drop ;
 : 2or  rot or >r or r> ;
 \ : press 
-\    begin read-all pressed? 0= while 2drop repeat 2drop ;
+\    begin keys pressed? 0= while 2drop repeat 2drop ;
 \ : waiting (  - n1 n2)
-\    begin press 30 #, ms read-all pressed? 0= while 2drop repeat ;
+\    begin press 30 #, ms keys pressed? 0= while 2drop repeat ;
 \ : accumulate ( n1 n2 - n3 n4)
-\    begin read-all pressed? while 2or repeat 2drop ;
+\    begin keys pressed? while 2or repeat 2drop ;
 
 here [ 4 + constant dict ]
 : dictionary  $a5 #, p! ;
@@ -53,8 +53,9 @@ here [ 4 + constant dict ]
     repeat ;
 : interpret
     begin
-        begin .sh cr query space find while execute repeat
-        tib count type huh?
+        begin .sh cr query space find while
+            execute S@ -if huh? then drop
+        repeat tib count type huh?
     again
 : digit ( n1 - n2)  $3a #, - -if 10 #, + exit then 29 #, - ; 
 : h# (  - n)  0 #,
@@ -62,13 +63,6 @@ here [ 4 + constant dict ]
         BL xor digit swap 2* 2* 2* 2* or
     repeat drop ; 
 
-: test ( n - )  -if true . exit then false . ;
-
-$ffff , $ffff ,
-: this char A #, emit char B #, emit char C #, emit cr ;
-$ffff , $ffff ,
-: one  1 #, ;
-: 'A'  $41 #, ;
 \ : scan (  - n1 n2)
 \    begin
 \        begin read-all pressed? 0= while drop drop repeat
@@ -77,6 +71,14 @@ $ffff , $ffff ,
 \    begin read-all pressed? while rot or >r or r> repeat
 \    drop drop ;
 : down  10 #, begin dup . 1- -until drop ;
+
+: .pin  \ use to see which key is which pin
+    false begin drop @pins until h.
+    begin @pins while drop repeat drop cr ;
+: .i2c  \ same but for the port expander
+    false begin drop @i2c until h.
+    begin @i2c while drop repeat drop cr ;
+
 
 turnkey wait interpret
 

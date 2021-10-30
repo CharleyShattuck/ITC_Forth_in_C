@@ -155,9 +155,10 @@ find	main.fs	+49
 interpret	main.fs	+54
 digit	main.fs	+59
 h#	main.fs	+60
-this	main.fs	+64
-one	main.fs	+66
-'A'	main.fs	+67
-down	main.fs	+75
+test	main.fs	+65
+this	main.fs	+68
+one	main.fs	+70
+'A'	main.fs	+71
+down	main.fs	+79
 .stack	job.fs	+56
 check	job.fs	+57

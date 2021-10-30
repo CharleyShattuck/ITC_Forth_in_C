@@ -308,7 +308,9 @@ FALSE:  T=0;
         if(T<0) goto TRUE;
         goto FALSE;
     case 40: // -
-        T=T-stack[--S];
+        W=T;
+        DROP;
+        T-=W;
         goto next;
     case 41: // =
         T=T-stack[--S];

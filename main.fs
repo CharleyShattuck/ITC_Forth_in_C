@@ -56,9 +56,13 @@ here [ 4 + constant dict ]
         begin .sh cr query space find while execute repeat
         tib count type huh?
     again
-: digit (  - n)  key $3a #, - -if 10 #, + exit then 29 #, - ; 
-: h# (  - n)  ; 
+: digit ( n1 - n2)  $3a #, - -if 10 #, + exit then 29 #, - ; 
+: h# (  - n)  0 #,
+    begin key BL max BL xor while
+        BL xor digit swap 2* 2* 2* 2* or
+    repeat drop ; 
 
+: test ( n - )  -if true . exit then false . ;
 
 $ffff , $ffff ,
 : this char A #, emit char B #, emit char C #, emit cr ;

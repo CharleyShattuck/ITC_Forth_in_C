@@ -91,13 +91,6 @@ void i2cRead(){
     T ^= 0xffff;
 }
 
-void setup() {
-  Serial.begin (9600);
-  i2cInit();
-  initPins();
-  delay(3000);
-}
-
 void readPins() {
     DUP;
     T=digitalRead(9);
@@ -123,6 +116,15 @@ void initPins() {
     pinMode(A4, INPUT_PULLUP);
     pinMode(A5, INPUT_PULLUP);
 }
+
+void setup() {
+  Serial.begin (9600);
+  i2cInit();
+  initPins();
+  delay(3000);
+}
+
+
 
 // code words all in one function
 // so we can avoid calls and just jump to next
@@ -405,6 +407,10 @@ FALSE:  T=0;
         goto next;
     case 62: // initPins
         initPins();
+        goto next;
+    case 63: // variable 
+        DUP;
+        T=pgm_read_word(&memory[W]);
         goto next;
     default:
         goto abort;

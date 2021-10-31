@@ -21,64 +21,35 @@ For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 
 [then]
 \ warnings off
+\ variables
+\ : K1  [ cpuHERE #, 2 cpuALLOT ] ;
+\ : K2  [ cpuHERE #, 2 cpuALLOT ] ;
+variable K1
+variable K2
+: 2drop  drop drop ;
+: 2or ( n1 n2 n3 n4 - n5 n6)  rot or >r or r> ;
 : wait  1000 #, ms ;
 : keys (  - n1 n2)  @pins @i2c ;
 : pressed? ( n1 n2 - n1 n2 flag)  over over or ;
-: 2drop  drop drop ;
-: 2or  rot or >r or r> ;
-\ : press 
-\    begin keys pressed? 0= while 2drop repeat 2drop ;
-\ : waiting (  - n1 n2)
-\    begin press 30 #, ms keys pressed? 0= while 2drop repeat ;
-\ : accumulate ( n1 n2 - n3 n4)
-\    begin keys pressed? while 2or repeat 2drop ;
+: press  begin keys pressed? 0= while drop 2drop repeat drop 2drop ;
+: waiting (  - n1 n2)
+    begin press 20 #, ms keys pressed? 0= while drop 2drop repeat drop ;
+: accumulate ( n1 n2 - n3 n4)
+    begin keys pressed? while drop 2or repeat drop 2drop ;
+: scan  waiting accumulate K2 ! K1 ! ;
+: first  [ cpuHERE #, 1 cpuALLOT ] ;
+: NKRO ( n1 n2 - )
+    false first c! 
+    ;
 
-here [ 4 + constant dict ]
-: dictionary  $a5 #, p! ;
-: tib (  - a)  0 #, ;
-: tib! ( c)  tib dup c@ 1+ over c! dup c@ + c! ;
-: echo ( c - c)  dup emit ;
-: query
-    0 #, tib ! false
-    begin drop key BL max BL xor until BL xor echo tib!
-    begin key BL max BL xor while BL xor echo tib! repeat
-    drop BL tib dup c@ + 1+ c! ;
-: match (  - 0|n)  \ P has been loaded
-    tib a! false p @p $ff #, and 2/ for @+ @p+ - or next
-    @p+ swap if 2drop false exit then drop ; 
-: find (  - a|0)
-    dictionary  \ loads P register
-    begin p @p while drop
-        tib a! match if exit then drop
-    repeat ;
-: interpret
-    begin
-        begin .sh cr query space find while
-            execute S@ -if huh? then drop
-        repeat tib count type huh?
-    again
-: digit ( n1 - n2)  $3a #, - -if 10 #, + exit then 29 #, - ; 
-: h# (  - n)  0 #,
-    begin key BL max BL xor while
-        BL xor digit swap 2* 2* 2* 2* or
-    repeat drop ; 
-
-\ : scan (  - n1 n2)
-\    begin
-\        begin read-all pressed? 0= while drop drop repeat
-\        10 #, ms read-all pressed? 0= while  drop drop drop drop
-\    repeat  rot or >r or r>
-\    begin read-all pressed? while rot or >r or r> repeat
-\    drop drop ;
-: down  10 #, begin dup . 1- -until drop ;
-
+0 [if]
 : .pin  \ use to see which key is which pin
     false begin drop @pins until h.
     begin @pins while drop repeat drop cr ;
 : .i2c  \ same but for the port expander
     false begin drop @i2c until h.
     begin @i2c while drop repeat drop cr ;
-
+[then]
 
 turnkey wait interpret
 

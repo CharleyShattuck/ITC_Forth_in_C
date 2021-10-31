@@ -92,7 +92,7 @@ code d# (  - n)  53 ,
 code huh?  54 ,
 code abort  55 ,
 code quit  56 ,
-code +branch  57 ,
+-code +branch  57 ,
 code nip  58 ,
 code invert  59 ,
 code h.  60 ,
@@ -124,6 +124,8 @@ code initPins  62 ,
 :m -:  -code  0 , m;
 :m :  code  0 , m;
 :m ;  exit m;
+:m variable  code 63 , cpuHERE , 2 cpuALLOT m;
+:m constant  code 63 , , m;
 
 : 1+  1 #+ ;
 : space  32 #, emit ;
@@ -131,9 +133,43 @@ code initPins  62 ,
 : type ( a l - )  -1 #+ for
         dup c@ emit 1+
     next drop ;
-: BL  32 #, ;
+\ : BL  32 #, ;
+32 constant BL
 : max ( a b - c)  over over < if
         drop swap drop exit
     then drop drop ;
 : 1-  -1 #+ ;
+: ? @ . ;
+
+\ interpretive debugging
+here [ 4 + constant dict ]
+: dictionary  $a5 #, p! ;
+\ : tib (  - a)  [ cpuHERE #, 32 cpuALLOT ] ;
+variable tib 30 cpuALLOT
+: tib! ( c)  tib dup c@ 1+ over c! dup c@ + c! ;
+: echo ( c - c)  dup emit ;
+: query
+    0 #, tib ! false
+    begin drop key BL max BL xor until BL xor echo tib!
+    begin key BL max BL xor while BL xor echo tib! repeat
+    drop BL tib dup c@ + 1+ c! ;
+: match (  - 0|n)  \ P has been loaded
+    tib a! false p @p $ff #, and 2/ for @+ @p+ - or next
+    @p+ swap if drop drop false exit then drop ; 
+: find (  - a|0)
+    dictionary  \ loads P register
+    begin p @p while drop
+        tib a! match if exit then drop
+    repeat ;
+: interpret
+    begin
+        begin .sh cr query space find while
+            execute S@ -if huh? then drop
+        repeat tib count type huh?
+    again
+: digit ( n1 - n2)  $3a #, - -if 10 #, + exit then 29 #, - ; 
+: h# (  - n)  0 #,
+    begin key BL max BL xor while
+        BL xor digit swap 2* 2* 2* 2* or
+    repeat drop ; 
 

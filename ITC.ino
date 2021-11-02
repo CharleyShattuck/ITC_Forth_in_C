@@ -2,7 +2,7 @@
 
 #include "memory.h"
 // #include <Keyboard.h>  // HID
- #include <Wire.h>      // i2c
+#include <Wire.h>      // i2c
 // it seems that Serial.h is loaded by default
 
 // stack grows upwards, makes .s easier
@@ -121,6 +121,7 @@ void setup() {
   Serial.begin (9600);
   i2cInit();
   initPins();
+//  Keyboard.begin();
   delay(3000);
 }
 
@@ -411,6 +412,17 @@ FALSE:  T=0;
     case 63: // variable 
         DUP;
         T=pgm_read_word(&memory[W]);
+        goto next;
+    case 64: // Keyboard.press
+//        Keyboard.press(T);
+        DROP;
+        goto next;
+    case 65: // Keyboard.release
+//        Keyboard.release(T);
+        DROP;
+        goto next;
+    case 66: // Keyboard.releaseAll
+//        Keyboard.releaseAll();
         goto next;
     default:
         goto abort;

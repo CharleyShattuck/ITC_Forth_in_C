@@ -98,6 +98,10 @@ code invert  59 ,
 code h.  60 ,
 code .sh  61 ,
 code initPins  62 ,
+\ variables  63
+code Keyboard.press  64 ,
+code Keyboard.release  65 ,
+code Keyboard.releaseAll  66 ,
 
 0 constant INPUT
 1 constant OUTPUT
@@ -124,6 +128,7 @@ code initPins  62 ,
 :m -:  -code  0 , m;
 :m :  code  0 , m;
 :m ;  exit m;
+:m cvariable  code 63 , cpuHERE , 1 cpuALLOT m;
 :m variable  code 63 , cpuHERE , 2 cpuALLOT m;
 :m constant  code 63 , , m;
 

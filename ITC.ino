@@ -424,6 +424,12 @@ FALSE:  T=0;
     case 66: // Keyboard.releaseAll
 //        Keyboard.releaseAll();
         goto next;
+    case 67: // !a+
+        W=T;
+        ram[A++]=W&0xff;
+        ram[A++]=(T>>8)&0xff;
+        DROP;
+        goto next;
     default:
         goto abort;
   }  

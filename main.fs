@@ -69,6 +69,8 @@ cvariable first
     dup   $80 #, and if [ char m ] #, spit then drop
     2drop ;
 [then]
+\ : spew  h. ;
+0 [if]
 : Gemini ( n1 n2 - )
     $80 #, >r
     over $10 #, and if r> $40 #, or >r then drop \ S1
@@ -78,18 +80,18 @@ cvariable first
     over $40 #, and if r> $04 #, or >r then drop \ P
     over $02 #, and if r> $02 #, or >r then drop \ W
     over $80 #, and if r> $01 #, or >r then drop \ H
-    r> h. 0 #, >r 
+    r> spew 0 #, >r 
     dup   $01 #, and if r> $40 #, or >r then drop \ R
     dup   $08 #, and if r> $20 #, or >r then drop \ A
     dup   $10 #, and if r> $10 #, or >r then drop \ O
     over $100 #, and if r> $08 #, or >r then drop \ *
     dup  $200 #, and if r> $04 #, or >r then drop \ *
-    r> h. 0 #, >r
+    r> spew 0 #, >r
     dup   $40 #, and if r> $08 #, or >r then drop \ E
     dup   $80 #, and if r> $04 #, or >r then drop \ U
     dup $8000 #, and if r> $02 #, or >r then drop \ F
     dup   $01 #, and if r> $01 #, or >r then drop \ R
-    r> h. 0 #, >r
+    r> spew 0 #, >r
     dup $4000 #, and if r> $40 #, or >r then drop \ P
     dup   $02 #, and if r> $20 #, or >r then drop \ B
     dup $2000 #, and if r> $10 #, or >r then drop \ L
@@ -97,13 +99,13 @@ cvariable first
     dup $1000 #, and if r> $04 #, or >r then drop \ T
     dup  $800 #, and if r> $02 #, or >r then drop \ S
     dup  $100 #, and if r> $01 #, or >r then drop \ D
-    r> h. 0 #, >r
+    r> spew 0 #, >r
     dup   $20 #, and if r> $40 #, or >r then drop \ #7
     dup  $400 #, and if r> $01 #, or >r then drop \ Z
-    r> h.
-    drop drop cr ;
-
-: test   begin scan Gemini .sh cr again
+    r> spew
+    drop drop ( cr) ;
+[then]
+\ : test   begin scan Gemini .sh cr again
 
 0 [if]
 : .pin  \ use to see which key is which pin
@@ -115,4 +117,5 @@ cvariable first
 [then]
 
 turnkey 1000 #, ms interpret
+\ turnkey 1000 #, ms begin scan Gemini again
 

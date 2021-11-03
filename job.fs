@@ -54,7 +54,7 @@ headers \ tack headers into end of dictionary
 host heads 2/ dict !-t \ patch start of dictionary
 
 : .stack  depth if  >red  then  .s >black cr ;
-: check  target-image 1024 dump ;
+: check  target-image target here host dump ;
 report save .( Host stack= ) .stack .words
 host cr .( heads=) heads 2/ u.
 cr \ check cr

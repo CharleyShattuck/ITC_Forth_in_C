@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 For LGPL information:   http://www.gnu.org/copyleft/lesser.txt
 
 [then]
-warnings off
+decimal warnings off
 host
 : -code  
    \ make a label and restore input stream
@@ -95,13 +95,14 @@ code quit  56 ,
 -code +branch  57 ,
 code nip  58 ,
 code invert  59 ,
-code h.  60 ,
+\ code h.  60 ,
 code .sh  61 ,
 code initPins  62 ,
 \ variables  63
 code Keyboard.press  64 ,
 code Keyboard.release  65 ,
 code Keyboard.releaseAll  66 ,
+code !a+ ( n)  67 ,
 
 0 constant INPUT
 1 constant OUTPUT
@@ -145,11 +146,20 @@ code Keyboard.releaseAll  66 ,
     then drop drop ;
 : 1-  -1 #+ ;
 : ? @ . ;
-
+-: dig ( n1 - n2 n3)  dup 2/ 2/ 2/ 2/
+    swap $0f #, and $0a #, - -if $3a #, + exit then
+    $61 #, + ;
+: h. ( n - )  dig >r dig >r dig >r dig
+    emit r> emit r> emit r> emit drop space ;
+: d ( a - a')  dup h. p! space 7 #, for @p+ h. next p ;
+variable pad 30 allot
+-: .word  pad a!
+    p @p $ff #, and 2/ for @p+ !a+ next
+    pad count type space @p+ h. ;
 \ interpretive debugging
 here [ 4 + constant dict ]
 : dictionary  $a5 #, p! ;
-\ : tib (  - a)  [ cpuHERE #, 32 cpuALLOT ] ;
+: words  cr dictionary begin p @p while drop .word cr repeat drop ;
 variable tib 30 cpuALLOT
 : tib! ( c)  tib dup c@ 1+ over c! dup c@ + c! ;
 : echo ( c - c)  dup emit ;
@@ -159,7 +169,7 @@ variable tib 30 cpuALLOT
     begin key BL max BL xor while BL xor echo tib! repeat
     drop BL tib dup c@ + 1+ c! ;
 : match (  - 0|n)  \ P has been loaded
-    tib a! false p @p $ff #, and 2/ for @+ @p+ - or next
+    false p @p $ff #, and 2/ for @+ @p+ - or next
     @p+ swap if drop drop false exit then drop ; 
 : find (  - a|0)
     dictionary  \ loads P register
@@ -172,9 +182,10 @@ variable tib 30 cpuALLOT
             execute S@ -if huh? then drop
         repeat tib count type huh?
     again
-: digit ( n1 - n2)  $3a #, - -if 10 #, + exit then 29 #, - ; 
+-: digit ( n1 - n2)  $3a #, - -if 10 #, + exit then 29 #, - ; 
 : h# (  - n)  0 #,
     begin key BL max BL xor while
         BL xor digit swap 2* 2* 2* 2* or
     repeat drop ; 
+: ' (  - a)  query find ;
 

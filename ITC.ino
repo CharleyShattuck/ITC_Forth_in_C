@@ -26,6 +26,7 @@ u16 T=0; // top of stack, cached, signed
 u16 N=0; // next on stack, not cached
 u16 A=0; // RAM address register
 u16 P=0; // program address register
+unsigned long elapsed=0;
 
 void dotS () {
     switch(S) {
@@ -429,6 +430,12 @@ FALSE:  T=0;
         ram[A++]=W&0xff;
         ram[A++]=(T>>8)&0xff;
         DROP;
+        goto next;
+    case 68: // counter
+        elapsed=millis();
+        goto next;
+    case 69: // timer
+        Serial.print((millis()-elapsed)&0xffff);
         goto next;
     default:
         goto abort;

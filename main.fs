@@ -116,6 +116,8 @@ cvariable first
     begin @i2c while drop repeat drop cr ;
 [then]
 
+: this  counter 10000 #, for next timer ;
+
 turnkey 1000 #, ms interpret
 \ turnkey 1000 #, ms begin scan Gemini again
 

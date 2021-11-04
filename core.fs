@@ -103,6 +103,8 @@ code Keyboard.press  64 ,
 code Keyboard.release  65 ,
 code Keyboard.releaseAll  66 ,
 code !a+ ( n)  67 ,
+code counter  68 ,
+code timer  69 ,
 
 0 constant INPUT
 1 constant OUTPUT

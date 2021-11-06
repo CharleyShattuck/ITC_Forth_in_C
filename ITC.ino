@@ -15,7 +15,7 @@ u16 rstack[RSTKSIZE];
 #define PUSH rstack[R++]=T
 #define POP T=rstack[--R]
 
-u8 ram[2048];
+u8 ram[1024];
 
 // Forth registers
 u16 W=0; // working register
@@ -28,7 +28,7 @@ u16 A=0; // RAM address register
 u16 P=0; // program address register
 unsigned long elapsed=0;
 
-void dotS () {
+void _dots() {
     switch(S) {
     case 0:
         Serial.print(" empty ");
@@ -48,7 +48,7 @@ void dotS () {
     }
 }
 
-void dotSH () {
+void _dotsh () {
     Serial.print(" ");
     switch(S) {
     case 0:
@@ -80,7 +80,7 @@ void i2cInit(){
 }
 
 
-void i2cRead(){
+void _i2cread(){
     DUP;
     Wire.beginTransmission(0x20);
     Wire.write(0x12); // GPIOA
@@ -92,7 +92,7 @@ void i2cRead(){
     T ^= 0xffff;
 }
 
-void readPins() {
+void _fetchpins() {
     DUP;
     T=digitalRead(9);
     T|=(digitalRead(10)<<1);
@@ -106,7 +106,7 @@ void readPins() {
     T^=0x01ff;
 }
 
-void initPins() {
+void _initPins() {
     pinMode(9, INPUT_PULLUP);
     pinMode(10, INPUT_PULLUP);
     pinMode(11, INPUT_PULLUP);
@@ -121,323 +121,591 @@ void initPins() {
 void setup() {
   Serial.begin (9600);
   i2cInit();
-  initPins();
+  _initPins();
 //  Keyboard.begin();
   delay(3000);
 }
 
+void _enter(){
+    rstack[R++]=I;
+    I=W;
+}
 
+void _exit(){
+    I=rstack[--R];
+}
+
+void _emit(){
+    Serial.write(T);
+    DROP;
+}
+
+void _ms(){
+    delay(T);
+    DROP;
+}
+
+void _branch(){
+    I=pgm_read_word(&memory[I]);
+}
+
+void _0branch(){
+    if(T==0) {
+        I=pgm_read_word(&memory[I]);
+        return;
+    }
+    I+=1;
+}
+
+void _lit(){
+    DUP;
+    T=pgm_read_word(&memory[I++]);
+}
+
+void _dot(){
+    Serial.print(T);
+    Serial.print(' ');
+    DROP;
+}
+
+void _dup(){
+    DUP;
+}
+
+void _drop(){
+    DROP;
+}
+
+void _plus(){
+    T=T+stack[--S];
+}
+
+void _and(){
+    T=T&stack[--S];
+}
+
+void _or(){
+    T=T|stack[--S];
+}
+
+void _xor(){
+    T=T^stack[--S];
+}
+
+void _key(){
+    DUP; 
+    while (!Serial.available());
+    T=Serial.read();
+}
+
+// void _execute(){
+//    W=T;
+//    DROP;
+// }
+
+void _fetchp(){
+    W=T;
+    T=pgm_read_word(&memory[W]);
+}
+
+void _cfetch(){
+    W=T;
+    T=ram[W];
+}
+
+void _fetch(){
+    W=T;
+    T=ram[W++];
+    T|=ram[W]<<8;
+}
+
+void _cstore(){
+    W=T;
+    DROP;
+    ram[W]=T;
+    DROP;
+}
+
+void _store(){
+    W=T;
+    DROP;
+    ram[W++]=T&0xff;
+    ram[W]=(T>>8)&0xff;
+    DROP;
+}
+
+void _next(){
+    W=rstack[R-1];
+    if(W) {
+        rstack[R-1]=W-1;
+        I=pgm_read_word(&memory[I]);
+        return;
+    }
+    R-=1;
+    I+=1;
+}
+
+void _tor(){
+    PUSH;
+    DROP;
+}
+
+void _rfrom(){
+    DUP;
+    POP;
+}
+
+void _rfetch(){
+    DUP;
+    T=rstack[R-1];
+}
+
+void _fetchpin(){
+    W=T;
+    T=digitalRead(W);
+}
+
+void _pinMode(){
+    W=T;
+    DROP;
+    pinMode(W, T);
+    DROP;
+}
+
+void _storepin(){
+    W=T;
+    DROP;
+    digitalWrite(W, T);
+    DROP;
+}
+
+void _over(){
+    W=stack[S-1];
+    DUP;
+    T=W;
+}
+
+void _sfetch(){
+    W=S;
+    DUP;
+    T=W;
+}
+
+void _swap(){
+    W=stack[S-1];
+    stack[S-1]=T;
+    T=W;
+}
+
+void _rot(){
+    N=stack[S-2];
+    W=stack[S-1];
+    stack[S-1]=T;
+    stack[S-2]=W;
+    T=N;
+}
+
+void _twostar(){
+    T=T<<1;
+}
+
+void _zeroequal(){
+    if(T==0){
+        T=0xffff;
+        return;
+    }
+    T=0;
+}
+
+void _zeroless(){
+    if(T<0){
+        T=0xffff;
+        return;
+    }
+    T=0;
+}
+
+void _minus(){
+    W=T;
+    DROP;
+    T-=W;
+}
+
+void _equal(){
+    T-=stack[--S];
+    if(T==0){
+        T=0xffff;
+        return;
+    }
+    T=0;
+}
+
+void _litplus(){
+    W=pgm_read_word(&memory[I++]);
+    T+=W;
+}
+
+void _less(){
+    W=T;
+    DROP;
+    if(T<W){
+        T=0xffff;
+        return;
+    }
+    T=0;
+}
+
+void _pstore(){
+    P=T;
+    DROP;
+}
+
+void _p(){
+    DUP;
+    T=P;
+}
+
+void _fetchpplus(){
+    DUP;
+    T=pgm_read_word(&memory[P++]);
+}
+
+void _fetchplus(){
+    DUP;
+    T=ram[A++];
+    T|=ram[A++]<<8;
+}
+
+void _cfetchplus(){
+    DUP;
+    T=ram[A++];
+}
+
+void _astore(){
+    A=T;
+    DROP;
+}
+
+void _a(){
+    DUP;
+    T=A;
+}
+
+void _twoslash(){
+    T=T/2;
+}
+
+void _cr(){
+    Serial.write("\n");
+}
+
+void _dnumber(){
+    DUP;
+    T=Serial.parseInt(SKIP_WHITESPACE);
+}
+
+void _huh(){
+    Serial.write(" ?\n");
+    _abort();
+}
+
+void _plusbranch(){
+    W=T;
+    if(W&0x8000){
+        I+=1;
+        return;
+    }
+    I=pgm_read_word(&memory[I]);
+}
+
+void _nip(){
+    S-=1;
+}
+
+void _invert(){
+    T=T^0xffff;
+}
+
+void _variable(){
+    DUP;
+    T=pgm_read_word(&memory[W]);
+}
+
+void _Keyboardpress(){
+//    Keyboard.press(T);
+    DROP;
+}
+
+void _Keyboardrelease(){
+//    Keyboard.release(T);
+    DROP;
+}
+
+void _KeyboardreleaseAll(){
+//    Keyboard.releaseAll();
+}
+
+void _storeaplus(){
+    W=T;
+    ram[A++]=W&0xff;
+    ram[A++]=(T>>8)&0xff;
+    DROP;
+}
+
+void _counter(){
+    elapsed=millis();
+}
+
+void _timer(){
+    Serial.print((millis()-elapsed)&0xffff);
+}
+
+void _false(){
+    DUP;
+    T=0;
+}
+
+void _true(){
+    DUP;
+    T=0xffff;
+}
+
+void _quit(){
+    R=0;
+    I=pgm_read_word(&memory[0]);
+}
+
+void _abort(){
+    S=0;
+    _quit();
+}
+
+void _nop(){
+}
+
+void (*function[])()={
+    _enter , _exit , _emit , _ms , _branch , _0branch , _lit , _dot ,
+    _dots , _dup , _drop , _plus , _and , _or , _xor , _key ,
+    _execute , _fetchp , _cfetch, _fetch , _cstore , _store , _tor , _rfrom ,
+    _rfetch , _next , _i2cread , _fetchpin , _pinMode , _storepin ,  _true , _false ,
+    _over , _sfetch , _fetchpins , _swap , _rot , _twostar , _zeroequal , _zeroless ,
+    _minus , _equal , _litplus , _less , _pstore , _p , _fetchpplus , _fetchplus ,
+    _cfetchplus , _astore , _a , _twoslash , _cr , _dnumber , _huh , _abort ,
+    _quit , _plusbranch , _nip , _invert , _nop , _dotsh , _initPins , _variable ,
+    _Keyboardpress , _Keyboardrelease , _KeyboardreleaseAll , _counter , _timer ,
+    _storeaplus ,
+};
+
+void _execute(){
+    W=T;
+    DROP;
+    (*function[pgm_read_word(&memory[W++])])();
+}
 
 // code words all in one function
 // so we can avoid calls and just jump to next
 void loop () {
 abort:
-  S=0;
+    S=0;
 quit:
-  R=0;
-  I=pgm_read_word(&memory[0]);
+    R=0;
+    I=pgm_read_word(&memory[0]);
 next:
-  W=pgm_read_word(&memory[I++]);
+    W=pgm_read_word(&memory[I++]);
+    (*function[pgm_read_word(&memory[W++])])();
+    goto next;
+/*    
 ex:
+//  if(W==0) goto abort;
   switch (pgm_read_word(&memory[W++])) {
     case 0: // enter
-        rstack[R++]=I;
-        I=W;
+        _enter();
         goto next;
     case 1: // exit
-        I=rstack[--R];
+        _exit();
         goto next;
     case 2: // emit
-        Serial.write(T);
-        DROP;
+        _emit();
         goto next;
     case 3: // ms
-        delay(T);
-        DROP;
+        _ms();
         goto next;
     case 4: // branch
-        I=pgm_read_word(&memory[I]);
+        _branch();
         goto next;
     case 5: // 0branch
-        if(T==0) {
-            I=pgm_read_word(&memory[I]);
-            goto next;
-        }
-        I+=1;
+        _0branch();
         goto next;
     case 6: // lit
-        DUP;
-        T=pgm_read_word(&memory[I++]);
+        _lit();
         goto next;
     case 7: // .
-        Serial.print(T);
-        Serial.print(' ');
-        DROP;
+        _dot();
         goto next;
     case 8: // .s
-        dotS();
+        _dots();
         goto next;
     case 9: // dup
-        DUP;
+        _dup();
         goto next;
     case 10: // drop
-        DROP;
+        _drop();
         goto next;
     case 11: // +
-        T=T+stack[--S];
+        _plus();
         goto next;
     case 12: // and
-        T=T&stack[--S];
+        _and();
         goto next;
     case 13: // or
-        T=T|stack[--S];
+        _or();
         goto next;
     case 14: // xor
-        T=T^stack[--S];
+        _xor();
         goto next;
     case 15: // key
-        DUP; 
-        while (!Serial.available());
-        T=Serial.read();
+        _key();
         goto next;
     case 16: // execute
-//        Serial.print("I= ");
-//        Serial.println(I);
-//        Serial.print("T= ");
-//        Serial.println(T);
-        if(T==0) goto abort;
-//        W=pgm_read_word(&memory[T]);
-        W=T;
-//        Serial.print("W= ");
-//        Serial.println(W);
-        DROP;
-        goto ex;
+        _execute();
+//        W=T;
+//        DROP;
+//        goto ex;
+        goto next;
     case 17: // @p
-        W=T;
-        T=pgm_read_word(&memory[W]);
+        _fetchp();
         goto next;
     case 18: // c@
-        W=T;
-        T=ram[W];
+        _cfetch();
         goto next;
     case 19: // @
-        W=T;
-        T=ram[W++];
-        T|=ram[W]<<8;
+        _fetch();
         goto next;
     case 20: // c!
-        W=T;
-        DROP;
-        ram[W]=T;
-        DROP;
+        _cstore();
         goto next;
     case 21: // !
-        W=T;
-        DROP;
-        ram[W++]=T&0xff;
-        ram[W]=(T>>8)&0xff;
-        DROP;
+        _store();
         goto next;
     case 22: // >r
-        PUSH;
-        DROP;
+        _tor();
         goto next;
     case 23: // r>
-        DUP;
-        POP;
+        _rfrom();
         goto next;
     case 24: // r@
-        DUP;
-        T=rstack[R-1];
+        _rfetch();
         goto next;
     case 25: // next
-        W=rstack[R-1];
-        if(W) {
-            rstack[R-1]=W-1;
-            I=pgm_read_word(&memory[I]);
-            goto next;
-        }
-        R-=1;
-        I+=1;
+        _next();
         goto next;
     case 26: // @i2c port expander
-        i2cRead();
+        _i2cread();
         goto next;
     case 27: // @pin
-        W=T;
-        T=digitalRead(W);
+        _fetchpin();
         goto next;
     case 28: // pinMode
-        W=T;
-        DROP;
-        pinMode(W, T);
-        DROP;
+        _pinMode();
         goto next;
     case 29: // !pin
-        W=T;
-        DROP;
-        digitalWrite(W, T);
-        DROP;
+        _storepin();
         goto next;
-    case 30: // true 
-        DUP;
-TRUE:   T=0xffff;
+    case 30: // true
+        _true();
         goto next;
-    case 31: // false 
-        DUP;
-FALSE:  T=0;
+    case 31: // false
+        _false();
         goto next;
     case 32: // over
-        W=stack[S-1];
-        DUP;
-        T=W;
+        _over();
         goto next;
     case 33: // S@
-        W=S;
-        DUP;
-        T=W;
+        _sfetch();
         goto next;
     case 34: // @pins 
-        readPins();
+        _fetchpins();
         goto next;
     case 35: // swap
-        W=stack[S-1];
-        stack[S-1]=T;
-        T=W;
+        _swap();
         goto next;
     case 36: // rot
-        N=stack[S-2];
-        W=stack[S-1];
-        stack[S-1]=T;
-        stack[S-2]=W;
-        T=N;
-        goto next;
+        _rot(); goto next;
     case 37: // 2*
-        T=T<<1;
-        goto next;
+        _twostar(); goto next;
     case 38: // 0=
-        if(T==0) goto TRUE;
-        goto FALSE;
+        _zeroequal(); goto next;
     case 39: // 0<
-        if(T<0) goto TRUE;
-        goto FALSE;
+        _zeroless(); goto next;
     case 40: // -
-        W=T;
-        DROP;
-        T-=W;
-        goto next;
+        _minus(); goto next;
     case 41: // =
-        T=T-stack[--S];
-        if(T==0) goto FALSE;
-        goto TRUE;
+        _equal(); goto next;
     case 42: // (#+)
-        W=pgm_read_word(&memory[I++]);
-        T+=W;
-        goto next;
+        _litplus(); goto next;
     case 43: // <
-        W=T;
-        DROP;
-        if(T<W) goto TRUE;
-        goto FALSE;
+        _less(); goto next;
     case 44: // p!
-        P=T;
-        DROP;
-        goto next;
+        _pstore(); goto next;
     case 45: // p
-        DUP;
-        T=P;
-        goto next;
+        _p(); goto next;
     case 46: // @p+
-        DUP;
-        T=pgm_read_word(&memory[P++]);
-        goto next;
+        _fetchpplus(); goto next;
     case 47: // @+
-        DUP;
-        T=ram[A++];
-        T|=ram[A++]<<8;
-        goto next;
+        _fetchplus(); goto next;
     case 48: // c@+
-        DUP;
-        T=ram[A++];
-        goto next;
+        _cfetchplus(); goto next;
     case 49: // a!
-        A=T;
-        DROP;
-        goto next;
+        _astore(); goto next;
     case 50: // a
-        DUP;
-        T=A;
-        goto next;
+        _a(); goto next;
     case 51: // 2/
-        T=T/2;
-        goto next;
+        _twoslash(); goto next;
     case 52: // cr
-        Serial.write("\n");
-        goto next;
+        _cr(); goto next;
     case 53: // d#
-        DUP;
-        T=Serial.parseInt(SKIP_WHITESPACE);
-        goto next;
+        _dnumber(); goto next;
     case 54: // huh?
-        Serial.write(" ?\n");
-// falls through into abort
+        _huh(); goto abort;
     case 55: // abort
-        goto abort;
+        _abort();
+        goto next;
     case 56: // quit
-        goto quit;
+        _quit();
+        goto next;
     case 57: // +branch
-        W=T;
-        if(W&0x8000){
-            I+=1;
-            goto next;
-        }
-        I=pgm_read_word(&memory[I]);
-        goto next;
+        _plusbranch(); goto next;
     case 58: // nip
-        S-=1;
-        goto next;
+        _nip(); goto next;
     case 59: // invert
-        T=T^0xffff;
-        goto next;
-    case 60: // h.
-        Serial.print(T, HEX);
-        Serial.print(' ');
-        DROP;
+        _invert(); goto next;
+    case 60: //
+        _nop();
         goto next;
     case 61: // .sh
-        dotSH();
-        goto next;
+        _dotsh(); goto next;
     case 62: // initPins
-        initPins();
-        goto next;
-    case 63: // variable 
-        DUP;
-        T=pgm_read_word(&memory[W]);
-        goto next;
+        _initPins(); goto next;
+    case 63: // variable
+        _variable(); goto next;
     case 64: // Keyboard.press
-//        Keyboard.press(T);
-        DROP;
-        goto next;
+        _Keyboardpress(); goto next;
     case 65: // Keyboard.release
-//        Keyboard.release(T);
-        DROP;
-        goto next;
+        _Keyboardrelease(); goto next;
     case 66: // Keyboard.releaseAll
-//        Keyboard.releaseAll();
-        goto next;
+        _KeyboardreleaseAll(); goto next;
     case 67: // !a+
-        W=T;
-        ram[A++]=W&0xff;
-        ram[A++]=(T>>8)&0xff;
-        DROP;
-        goto next;
+        _storeaplus(); goto next;
     case 68: // counter
-        elapsed=millis();
-        goto next;
+        _counter(); goto next;
     case 69: // timer
-        Serial.print((millis()-elapsed)&0xffff);
+        _timer();
+        goto next;
+    case 70: // perform
+//       _perform();
+       _execute();
         goto next;
     default:
         goto abort;
-  }  
+  }  */
 }

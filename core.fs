@@ -95,16 +95,16 @@ code quit  56 ,
 -code +branch  57 ,
 code nip  58 ,
 code invert  59 ,
-\ code h.  60 ,
+code nop  60 ,
 code .sh  61 ,
 code initPins  62 ,
 \ variables  63
 code Keyboard.press  64 ,
 code Keyboard.release  65 ,
 code Keyboard.releaseAll  66 ,
-code !a+ ( n)  67 ,
-code counter  68 ,
-code timer  69 ,
+code counter  67 ,
+code timer  68 ,
+code !a+ ( n)  69 ,
 
 0 constant INPUT
 1 constant OUTPUT

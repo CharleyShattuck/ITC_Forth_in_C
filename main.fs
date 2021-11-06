@@ -69,8 +69,9 @@ cvariable first
     dup   $80 #, and if [ char m ] #, spit then drop
     2drop ;
 [then]
-\ : spew  h. ;
-0 [if]
+: spew  h. ;
+\ : spew  emit ;
+\ 0 [if]
 : Gemini ( n1 n2 - )
     $80 #, >r
     over $10 #, and if r> $40 #, or >r then drop \ S1
@@ -103,9 +104,9 @@ cvariable first
     dup   $20 #, and if r> $40 #, or >r then drop \ #7
     dup  $400 #, and if r> $01 #, or >r then drop \ Z
     r> spew
-    drop drop ( cr) ;
-[then]
-\ : test   begin scan Gemini .sh cr again
+    drop drop ;
+: test   begin scan Gemini .sh cr again
+\ [then]
 
 0 [if]
 : .pin  \ use to see which key is which pin
@@ -116,7 +117,7 @@ cvariable first
     begin @i2c while drop repeat drop cr ;
 [then]
 
-: this  counter 10000 #, for next timer ;
+: this counter 10000 #, for next timer ;
 
 turnkey 1000 #, ms interpret
 \ turnkey 1000 #, ms begin scan Gemini again
